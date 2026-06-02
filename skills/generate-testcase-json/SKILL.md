@@ -26,7 +26,7 @@ Each testcase is an object with these keys (note the spaces in key names):
 [
   {
     "ID": "TC001",
-    "TITLE": "Xác minh đăng nhập thành công với tài khoản hợp lệ",
+    "TITLE": "Xác minh đăng nhập với tài khoản hợp lệ",
     "STEPS": [
       "B1: Mở trang đăng nhập.",
       "B2: Nhập email hợp lệ.",
@@ -34,7 +34,7 @@ Each testcase is an object with these keys (note the spaces in key names):
       "B4: Nhấn nút Đăng nhập."
     ],
     "DATATEST": "email: user@example.com, password: Passw0rd!",
-    "EXPECTED RESULT": "Chuyển đến trang chủ.",
+    "EXPECTED RESULT": "Hiển thị trang chủ của người dùng sau khi đăng nhập thành công.",
     "ACTUAL RESULT": "",
     "STATUS": "PENDING",
     "COMMENT": ""

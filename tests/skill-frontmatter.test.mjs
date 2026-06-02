@@ -77,5 +77,10 @@ test('generate-testcase-json example follows the validated schema', () => {
 
   const cases = JSON.parse(match[1]);
   assert.equal(Array.isArray(cases[0].STEPS), true, 'example STEPS must be an array');
+  assert.match(
+    cases[0]['EXPECTED RESULT'],
+    /trang chủ của người dùng sau khi đăng nhập thành công/,
+    'example EXPECTED RESULT must be specific enough to understand the expected state'
+  );
   assert.equal(validateCases(cases).valid, true, 'example must pass testcase validation');
 });
