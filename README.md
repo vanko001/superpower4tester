@@ -34,3 +34,11 @@ This plugin uses Chrome DevTools MCP at runtime through:
 ```
 
 See `docs/install/` for harness-specific setup.
+
+## Installation
+
+- [Codex](docs/install/codex.md)
+- [Claude Code](docs/install/claude-code.md)
+- [Cursor](docs/install/cursor.md)
+- [Gemini CLI](docs/install/gemini.md)
+- [OpenCode](docs/install/opencode.md)
