@@ -23,16 +23,47 @@ branch management, or pull-request workflows. `superpower4tester` should focus
 on testcase design, UI discovery, execution, defect evidence, and result
 reporting.
 
+Do not keep upstream skill directory names unchanged. Runtime skill names must
+be tester-specific and unique enough to install alongside the original
+`superpowers` plugin without collisions. For example, copy `writing-skills`
+only as `maintaining-tester-skills`, not as another `writing-skills` skill.
+
 ## Target Harnesses
 
 The repo should support these harnesses from the first implementation plan:
 
 - Codex / Codex App: `.codex-plugin/plugin.json` plus `.mcp.json`
-- Claude Code: `.claude-plugin/plugin.json` plus marketplace metadata
-- Cursor: `.cursor-plugin/plugin.json`
+- Claude Code: `.claude-plugin/plugin.json`, `.claude-plugin/marketplace.json`,
+  and `hooks/hooks.json`
+- Cursor: `.cursor-plugin/plugin.json` plus `hooks/hooks-cursor.json`
 - Gemini CLI: `gemini-extension.json`
-- OpenCode: `opencode/plugin.json` or `.opencode/` metadata following the
-  current Superpowers pattern
+- OpenCode: `.opencode/plugins/superpower4tester.js` plus
+  `.opencode/INSTALL.md`
+
+## Turn-Start Bootstrap And Hooks
+
+The `using-superpower4tester` discipline is not only a normal skill. It must be
+bootstrapped at session start where the harness supports that behavior.
+
+Port the upstream Superpowers hook pattern:
+
+- `hooks/session-start` reads `skills/using-superpower4tester/SKILL.md` and
+  injects it as additional context.
+- `hooks/run-hook.cmd` provides the Windows/Unix wrapper.
+- `hooks/hooks.json` registers `SessionStart` for Claude Code compatible hook
+  runtimes.
+- `hooks/hooks-cursor.json` registers `sessionStart` for Cursor.
+- `.opencode/plugins/superpower4tester.js` injects the bootstrap context through
+  OpenCode's message transform and registers the plugin skills path, following
+  the upstream `.opencode/plugins/superpowers.js` pattern.
+
+Codex requires a separate verification step. The local Codex plugin validator
+accepts `mcpServers` but does not accept a `hooks` field in
+`.codex-plugin/plugin.json`. Do not add unsupported Codex manifest fields unless
+the validator proves they are accepted. If Codex has no plugin hook surface for
+session-start injection, Codex support should still expose the skills and MCP
+server, but the implementation report must explicitly say that turn-start
+bootstrap is not enforced in Codex.
 
 Where a harness supports MCP server declarations, configure Chrome DevTools MCP
 with:
@@ -48,9 +79,17 @@ with:
 }
 ```
 
-Codex should use `mcpServers: "./.mcp.json"` from `.codex-plugin/plugin.json`.
-Other harnesses should use the closest supported manifest shape from
-Superpowers and Chrome DevTools MCP.
+## Harness MCP Registration
+
+Use these concrete registration paths so implementation does not guess:
+
+| Harness | MCP registration |
+| --- | --- |
+| Codex / Codex App | `.codex-plugin/plugin.json` includes `"mcpServers": "./.mcp.json"` and root `.mcp.json` contains the `mcpServers.chrome-devtools` block. Validate this with the local Codex plugin validator. |
+| Claude Code | `.claude-plugin/plugin.json` includes inline `"mcpServers": { "chrome-devtools": ... }`, matching Chrome DevTools MCP's Claude plugin shape. |
+| Cursor | `.cursor-plugin/plugin.json` includes inline `"mcpServers": { "chrome-devtools": ... }`, matching Chrome DevTools MCP's Cursor plugin shape. |
+| Gemini CLI | `gemini-extension.json` includes inline `"mcpServers": { "chrome-devtools": ... }`, matching Chrome DevTools MCP's Gemini extension shape. |
+| OpenCode | `.opencode/plugins/superpower4tester.js` should add `config.mcp["chrome-devtools"]` when absent. `.opencode/INSTALL.md` must also include the equivalent `opencode.json` fallback using `"mcp": { "chrome-devtools": { "type": "local", "command": ["npx", "-y", "chrome-devtools-mcp@1.1.1"] } }`. |
 
 ## Chrome DevTools MCP Dependency
 
@@ -93,6 +132,9 @@ Rules:
 
 - `ID` is stable and unique. Prefer `TC001`, `TC002`, ...
 - `TITLE` starts with one of: `Xác nhận`, `Xác minh`, `Kiểm tra`.
+- This is a Vietnamese-first plugin by default. The validator should enforce
+  the Vietnamese title prefixes for v1. A future config file may allow alternate
+  prefixes, but v1 should not silently accept generic English titles.
 - `TITLE` is short enough to scan but clear enough to know exactly what is
   being tested.
 - Do not group multiple behaviors into one testcase.
@@ -104,9 +146,30 @@ Rules:
 - `ACTUAL RESULT` is filled only after execution and should mirror the style of
   `EXPECTED RESULT`.
 - `STATUS` is one of `PASS`, `FAIL`, `PENDING`.
+- `PENDING` covers both "not yet executed" and blocked cases because the user
+  requirement allows only `PASS`, `FAIL`, and `PENDING`.
 - `COMMENT` is blank for `PASS` unless useful context is needed; for `FAIL`,
   it must describe the defect clearly enough for a developer to locate the
   problem.
+- Scripts must handle exact JSON keys with spaces, especially
+  `EXPECTED RESULT` and `ACTUAL RESULT`, because the schema maps directly to
+  tester-facing spreadsheet columns.
+
+## Runtime Safety Guardrails
+
+Browser execution can submit real forms, upload files, send emails, update
+records, or delete data. The plugin must treat these as high-risk actions.
+
+Before running `execute-testcase-json` or `executing-test-runs`, the agent must:
+
+1. confirm the target environment is safe for testing or already provided by
+   the user as a test/staging environment
+2. identify destructive or externally visible actions in the steps
+3. stop and ask for explicit approval before submitting destructive actions,
+   payments, emails, irreversible updates, deletes, or uploads
+4. mark the case `PENDING` with a clear `COMMENT` when execution is blocked by
+   production risk or missing permission
+5. avoid exposing secrets in screenshots, comments, logs, or generated fixtures
 
 ## Skills To Adapt From Superpowers
 
@@ -124,7 +187,7 @@ tester phases:
 The skill should force the agent to choose a relevant tester skill before
 designing or executing test cases.
 
-### `brainstorming` -> `test-scope-discovery`
+### `brainstorming` -> `tester-scope-discovery`
 
 Use before broad testcase generation or unclear test requests. It should ask
 for scope only when needed: target module, URL, docs, account/session, browser
@@ -153,7 +216,7 @@ Execute a written test plan or an existing `testcase.json`. For each case:
 4. observe UI, console, and network where relevant
 5. update `ACTUAL RESULT`, `STATUS`, and `COMMENT`
 6. preserve `PENDING` when blocked by missing credentials, unavailable
-   environment, ambiguous requirement, or unsafe data action
+   environment, ambiguous requirement, production risk, or unsafe action
 
 ### `verification-before-completion` -> `evidence-before-result`
 
@@ -196,7 +259,8 @@ fresh-subagent idea, but replace spec/code review with:
 
 ### `writing-skills`
 
-Keep a lightly adapted version for maintaining future tester skills.
+Copy only as `maintaining-tester-skills`. Keep a lightly adapted version for
+maintaining future tester skills.
 
 ## Skills To Omit Or Keep Out Of The Main Tester Flow
 
@@ -209,6 +273,8 @@ Keep a lightly adapted version for maintaining future tester skills.
   trigger during normal testcase generation or execution.
 - `receiving-code-review`: optional contributor skill. It is not part of the
   core tester runtime.
+- `writing-skills`: do not copy under this name because it collides with the
+  upstream Superpowers skill. Use `maintaining-tester-skills`.
 
 ## New Tester-Specific Skills
 
@@ -264,7 +330,10 @@ superpower4tester/
   .cursor-plugin/plugin.json
   .mcp.json
   gemini-extension.json
-  opencode/plugin.json
+  .opencode/
+    INSTALL.md
+    plugins/
+      superpower4tester.js
   package.json
   README.md
   LICENSE
@@ -280,7 +349,7 @@ superpower4tester/
     normalize-testcase-json.mjs
   skills/
     using-superpower4tester/SKILL.md
-    test-scope-discovery/SKILL.md
+    tester-scope-discovery/SKILL.md
     testcase-design-first/SKILL.md
     writing-test-plans/SKILL.md
     generate-testcase-json/SKILL.md
@@ -292,7 +361,12 @@ superpower4tester/
     evidence-before-result/SKILL.md
     parallel-test-analysis/SKILL.md
     subagent-driven-testing/SKILL.md
-    writing-skills/SKILL.md
+    maintaining-tester-skills/SKILL.md
+  hooks/
+    hooks.json
+    hooks-cursor.json
+    run-hook.cmd
+    session-start
 ```
 
 ## Quality Gates
@@ -302,11 +376,16 @@ Implementation should not be considered ready until:
 - every manifest parses as JSON
 - `.codex-plugin/plugin.json` validates against local Codex plugin validator
 - `.mcp.json` launches Chrome DevTools MCP via `npx`
+- Claude/Cursor hooks inject `using-superpower4tester` session-start context
+- OpenCode plugin injects `using-superpower4tester` context and registers the
+  skills path
 - every `SKILL.md` has valid frontmatter with matching directory/name
+- no runtime `SKILL.md` directory keeps an upstream Superpowers name unchanged
 - testcase validation script catches grouped or malformed cases
 - sample `testcase.json` passes validation
 - a dry-run browser workflow proves the agent can inspect a page and write one
   `PENDING`, one `PASS`, and one simulated or fixture-based `FAIL`
+- safety guardrails block a destructive fixture case and mark it `PENDING`
 
 ## Open Decisions For Implementation Plan
 
@@ -316,3 +395,7 @@ Implementation should not be considered ready until:
   metadata for a public GitHub repo immediately.
 - Whether the sample test run should target a local fixture page or a public
   static page. A local fixture is safer for repeatable tests.
+- Whether Codex exposes a plugin hook mechanism that passes local validation.
+  If not, document Codex as skill-triggered rather than turn-start enforced.
+- Whether Vietnamese title prefixes remain hardcoded in v1 or move to a config
+  file in v2. V1 defaults to hardcoded Vietnamese prefixes.
