@@ -36,3 +36,13 @@ test('Gemini context file exists and points to tester bootstrap skill', () => {
   assert.match(content, /skills\/using-superpower4tester\/SKILL\.md/);
   assert.doesNotMatch(content, /skills\/using-superpowers\/SKILL\.md/);
 });
+
+test('package root exports the OpenCode plugin entrypoint', () => {
+  const manifest = readJson('package.json');
+  const entrypoint = './.opencode/plugins/superpower4tester.js';
+
+  assert.equal(manifest.type, 'module');
+  assert.equal(manifest.main, entrypoint);
+  assert.equal(manifest.exports, entrypoint);
+  assert.equal(fs.existsSync(entrypoint), true);
+});
