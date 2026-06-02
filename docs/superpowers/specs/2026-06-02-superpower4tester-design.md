@@ -56,6 +56,10 @@ Port the upstream Superpowers hook pattern:
 - `.opencode/plugins/superpower4tester.js` injects the bootstrap context through
   OpenCode's message transform and registers the plugin skills path, following
   the upstream `.opencode/plugins/superpowers.js` pattern.
+- OpenCode MCP auto-registration, if implemented, is not copied from
+  Superpowers. It is net-new code and should be treated as best-effort until an
+  OpenCode run proves the Chrome DevTools tools are available. The documented
+  `opencode.json` fallback remains the guaranteed route.
 
 Codex requires a separate verification step. The local Codex plugin validator
 accepts `mcpServers` but does not accept a `hooks` field in
@@ -81,15 +85,17 @@ with:
 
 ## Harness MCP Registration
 
-Use these concrete registration paths so implementation does not guess:
+Use these concrete registration paths so implementation does not guess. Do not
+infer MCP behavior from Superpowers manifests because Superpowers has no MCP
+server. Use Chrome DevTools MCP manifests and README examples for MCP evidence.
 
-| Harness | MCP registration |
-| --- | --- |
-| Codex / Codex App | `.codex-plugin/plugin.json` includes `"mcpServers": "./.mcp.json"` and root `.mcp.json` contains the `mcpServers.chrome-devtools` block. Validate this with the local Codex plugin validator. |
-| Claude Code | `.claude-plugin/plugin.json` includes inline `"mcpServers": { "chrome-devtools": ... }`, matching Chrome DevTools MCP's Claude plugin shape. |
-| Cursor | `.cursor-plugin/plugin.json` includes inline `"mcpServers": { "chrome-devtools": ... }`, matching Chrome DevTools MCP's Cursor plugin shape. |
-| Gemini CLI | `gemini-extension.json` includes inline `"mcpServers": { "chrome-devtools": ... }`, matching Chrome DevTools MCP's Gemini extension shape. |
-| OpenCode | `.opencode/plugins/superpower4tester.js` should add `config.mcp["chrome-devtools"]` when absent. `.opencode/INSTALL.md` must also include the equivalent `opencode.json` fallback using `"mcp": { "chrome-devtools": { "type": "local", "command": ["npx", "-y", "chrome-devtools-mcp@1.1.1"] } }`. |
+| Harness | Bundled plugin route | Manual fallback | Verification source |
+| --- | --- | --- | --- |
+| Codex / Codex App | `.codex-plugin/plugin.json` includes `"mcpServers": "./.mcp.json"` and root `.mcp.json` contains `mcpServers.chrome-devtools`. | `codex mcp add chrome-devtools -- npx chrome-devtools-mcp@1.1.1` | Codex local plugin validator accepts `mcpServers`; Chrome DevTools MCP README documents the Codex CLI command. |
+| Claude Code | `.claude-plugin/plugin.json` includes inline `"mcpServers": { "chrome-devtools": ... }`. | `claude mcp add chrome-devtools --scope user npx chrome-devtools-mcp@1.1.1` | Chrome DevTools MCP `.claude-plugin/plugin.json` uses inline `mcpServers`; README documents the CLI and plugin install routes. |
+| Cursor | `.cursor-plugin/plugin.json` includes inline `"mcpServers": { "chrome-devtools": ... }`. | Cursor Settings -> MCP -> New MCP Server with `npx -y chrome-devtools-mcp@1.1.1`. | Chrome DevTools MCP `.cursor-plugin/plugin.json` uses inline `mcpServers`; README documents Cursor MCP settings and deeplink install. |
+| Gemini CLI | `gemini-extension.json` includes inline `"mcpServers": { "chrome-devtools": ... }`. | `gemini mcp add chrome-devtools npx chrome-devtools-mcp@1.1.1` | Chrome DevTools MCP `gemini-extension.json` uses inline `mcpServers`; README documents `gemini mcp add` and extension install. |
+| OpenCode | `.opencode/plugins/superpower4tester.js` follows Superpowers for context injection and skills path. MCP auto-registration is best-effort net-new code and must be verified before relying on it. | `.opencode/INSTALL.md` must document `opencode.json` with `"mcp": { "chrome-devtools": { "type": "local", "command": ["npx", "-y", "chrome-devtools-mcp@1.1.1"] } }`. | Superpowers verifies OpenCode plugin context/skills path only; Chrome DevTools MCP README verifies the `opencode.json` MCP route. |
 
 ## Chrome DevTools MCP Dependency
 
@@ -379,6 +385,9 @@ Implementation should not be considered ready until:
 - Claude/Cursor hooks inject `using-superpower4tester` session-start context
 - OpenCode plugin injects `using-superpower4tester` context and registers the
   skills path
+- `.opencode/INSTALL.md` documents the verified `opencode.json` MCP fallback;
+  any automatic OpenCode MCP registration is not considered complete unless a
+  smoke run proves Chrome DevTools tools are available
 - every `SKILL.md` has valid frontmatter with matching directory/name
 - no runtime `SKILL.md` directory keeps an upstream Superpowers name unchanged
 - testcase validation script catches grouped or malformed cases
@@ -399,3 +408,5 @@ Implementation should not be considered ready until:
   If not, document Codex as skill-triggered rather than turn-start enforced.
 - Whether Vietnamese title prefixes remain hardcoded in v1 or move to a config
   file in v2. V1 defaults to hardcoded Vietnamese prefixes.
+- Whether to implement OpenCode MCP auto-registration at all. It is best-effort
+  and secondary to the documented `opencode.json` fallback.
