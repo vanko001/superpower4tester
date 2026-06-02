@@ -1,0 +1,33 @@
+{
+  "name": "superpower4tester",
+  "version": "0.1.0",
+  "description": "Tester workflows for granular testcase JSON generation and Chrome DevTools MCP execution.",
+  "author": {
+    "name": "superpower4tester contributors",
+    "url": "https://github.com/vanko001/superpower4tester"
+  },
+  "homepage": "https://github.com/vanko001/superpower4tester",
+  "repository": "https://github.com/vanko001/superpower4tester",
+  "license": "MIT",
+  "keywords": ["testing", "testcase", "qa", "chrome-devtools-mcp", "skills"],
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json",
+  "interface": {
+    "displayName": "superpower4tester",
+    "shortDescription": "Generate and execute granular testcase JSON with browser evidence",
+    "longDescription": "Use superpower4tester to inspect requirements and UI, generate detailed Vietnamese-first testcase.json files, execute them through Chrome DevTools MCP, and write PASS, FAIL, or PENDING results with clear comments.",
+    "developerName": "superpower4tester contributors",
+    "category": "Coding",
+    "capabilities": ["Interactive", "Read", "Write"],
+    "defaultPrompt": [
+      "Generate testcase.json from these requirements.",
+      "Inspect this UI and design test cases.",
+      "Execute testcase.json and update results."
+    ],
+    "websiteURL": "https://github.com/vanko001/superpower4tester",
+    "privacyPolicyURL": "https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement",
+    "termsOfServiceURL": "https://docs.github.com/en/site-policy/github-terms/github-terms-of-service",
+    "brandColor": "#16A34A",
+    "screenshots": []
+  }
+}
