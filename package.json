@@ -10,7 +10,8 @@
     "summarize:sample": "node scripts/summarize-test-results.mjs tests/fixtures/valid-testcase.json",
     "normalize:sample": "node scripts/normalize-testcase-json.mjs tests/fixtures/valid-testcase.json --check",
     "validate:codex-plugin": "python3 /home/vule/.codex/skills/.system/plugin-creator/scripts/validate_plugin.py .",
-    "check:mcp": "npx -y chrome-devtools-mcp@1.1.1 --help"
+    "check:mcp": "npx -y chrome-devtools-mcp@1.1.1 --help",
+    "smoke:browser-doc": "node scripts/validate-testcase-json.mjs tests/fixtures/browser-smoke-testcase.json && echo \"Use Chrome DevTools MCP to open tests/fixtures/test-page.html for browser smoke execution\""
   },
   "engines": {
     "node": ">=20"

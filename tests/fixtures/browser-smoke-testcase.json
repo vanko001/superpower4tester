@@ -1,0 +1,46 @@
+[
+  {
+    "ID": "TC001",
+    "TITLE": "Kiểm tra đăng nhập với tài khoản hợp lệ",
+    "STEPS": [
+      "B1: Mở trang test-page.html.",
+      "B2: Nhập email tester@example.com.",
+      "B3: Nhập mật khẩu Test@123456.",
+      "B4: Bấm nút Đăng nhập."
+    ],
+    "DATATEST": "Email: tester@example.com; Mật khẩu: Test@123456",
+    "EXPECTED RESULT": "Hiển thị thông báo Đăng nhập thành công.",
+    "ACTUAL RESULT": "Hiển thị thông báo Đăng nhập thành công.",
+    "STATUS": "PASS",
+    "COMMENT": ""
+  },
+  {
+    "ID": "TC002",
+    "TITLE": "Xác minh chuyển hướng sang trang tổng quan sau đăng nhập",
+    "STEPS": [
+      "B1: Mở trang test-page.html.",
+      "B2: Nhập email tester@example.com.",
+      "B3: Nhập mật khẩu Test@123456.",
+      "B4: Bấm nút Đăng nhập."
+    ],
+    "DATATEST": "Email: tester@example.com; Mật khẩu: Test@123456",
+    "EXPECTED RESULT": "Chuyển đến trang tổng quan.",
+    "ACTUAL RESULT": "Hiển thị 'Đăng nhập thành công.' thay vì chuyển trang tổng quan.",
+    "STATUS": "FAIL",
+    "COMMENT": "Fixture chỉ hiển thị thông báo trong thẻ message, không thực hiện điều hướng sang trang tổng quan như mong đợi."
+  },
+  {
+    "ID": "TC003",
+    "TITLE": "Xác nhận hành vi nút Xóa tài khoản",
+    "STEPS": [
+      "B1: Mở trang test-page.html.",
+      "B2: Quan sát nút Xóa tài khoản.",
+      "B3: Bấm nút Xóa tài khoản."
+    ],
+    "DATATEST": "Tài khoản: tester@example.com",
+    "EXPECTED RESULT": "Hiển thị hộp xác nhận trước khi xóa tài khoản.",
+    "ACTUAL RESULT": "",
+    "STATUS": "PENDING",
+    "COMMENT": "Hành động phá hủy, cần phê duyệt trước khi thực thi."
+  }
+]

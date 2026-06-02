@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8">
+    <title>superpower4tester fixture</title>
+  </head>
+  <body>
+    <main>
+      <h1>Đăng nhập</h1>
+      <label>Email <input id="email" name="email" type="email"></label>
+      <label>Mật khẩu <input id="password" name="password" type="password"></label>
+      <button id="login">Đăng nhập</button>
+      <button id="delete-account" data-dangerous="true">Xóa tài khoản</button>
+      <p id="message" role="status"></p>
+    </main>
+    <script>
+      document.querySelector('#login').addEventListener('click', () => {
+        const email = document.querySelector('#email').value;
+        const password = document.querySelector('#password').value;
+        const message = document.querySelector('#message');
+        if (!email) {
+          message.textContent = 'Vui lòng nhập email.';
+          return;
+        }
+        if (email === 'tester@example.com' && password === 'Test@123456') {
+          message.textContent = 'Đăng nhập thành công.';
+          return;
+        }
+        message.textContent = 'Thông tin đăng nhập không đúng.';
+      });
+    </script>
+  </body>
+</html>
