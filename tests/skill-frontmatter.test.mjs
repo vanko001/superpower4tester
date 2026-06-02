@@ -8,6 +8,7 @@ const expectedSkills = [
   'using-superpower4tester',
   'tester-scope-discovery',
   'testcase-design-first',
+  'blackbox-edgecase-design',
   'writing-test-plans',
   'generate-testcase-json',
   'ui-discovery-with-chrome-devtools',
@@ -83,4 +84,34 @@ test('generate-testcase-json example follows the validated schema', () => {
     'example EXPECTED RESULT must be specific enough to understand the expected state'
   );
   assert.equal(validateCases(cases).valid, true, 'example must pass testcase validation');
+});
+
+test('testcase design skills include black-box edgecase heuristics', () => {
+  const designFirst = fs.readFileSync(path.join('skills', 'testcase-design-first', 'SKILL.md'), 'utf8');
+  const blackbox = fs.readFileSync(path.join('skills', 'blackbox-edgecase-design', 'SKILL.md'), 'utf8');
+  const generator = fs.readFileSync(path.join('skills', 'generate-testcase-json', 'SKILL.md'), 'utf8');
+  const quality = fs.readFileSync(path.join('skills', 'testcase-quality-review', 'SKILL.md'), 'utf8');
+  const using = fs.readFileSync(path.join('skills', 'using-superpower4tester', 'SKILL.md'), 'utf8');
+  const plan = fs.readFileSync(path.join('skills', 'writing-test-plans', 'SKILL.md'), 'utf8');
+  const combined = `${designFirst}\n${blackbox}\n${generator}\n${quality}\n${using}\n${plan}`;
+
+  for (const keyword of [
+    'Risk-Based Testing',
+    'State Transition Testing',
+    'SFDPOT',
+    'Equivalence Partitioning',
+    'Boundary Value Analysis',
+    'Decision Table',
+    'Pairwise Testing',
+    'Negative Testing',
+    'Integration',
+    'AI QA / Agent Testing'
+  ]) {
+    assert.match(combined, new RegExp(keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')), `missing ${keyword}`);
+  }
+
+  assert.match(generator, /Enhanced Black-Box Prompt/);
+  assert.match(quality, /Edgecase Coverage/);
+  assert.match(using, /Black-box edgecase design: `blackbox-edgecase-design`/);
+  assert.match(plan, /Black-box edgecase matrix/);
 });

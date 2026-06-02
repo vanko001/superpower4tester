@@ -22,6 +22,7 @@ Before testcase design, UI inspection, execution, result writing, or defect anal
 
 - Unclear scope: `tester-scope-discovery`
 - Before generation or execution: `testcase-design-first`
+- Black-box edgecase design: `blackbox-edgecase-design`
 - Multi-step campaign planning: `writing-test-plans`
 - Generate cases: `generate-testcase-json`
 - Inspect UI: `ui-discovery-with-chrome-devtools`

@@ -16,9 +16,10 @@ Review every generated `testcase.json` against this checklist before execution. 
 - **One expected result**: `EXPECTED RESULT` describes a single, verifiable outcome.
 - **Negative cases**: invalid inputs, empty fields, boundaries, and error paths are covered, not just the happy path.
 - **Role / state coverage**: relevant user roles, permissions, and pre-states are represented.
+- **Edgecase Coverage**: black-box techniques are represented where relevant: Risk-Based Testing, State Transition Testing, SFDPOT, Equivalence Partitioning, Boundary Value Analysis, Decision Table, Pairwise Testing, Negative Testing, Integration, security/performance, and AI QA / Agent Testing.
 - **STEPS format**: ordered `B1`, `B2`, `B3` steps that map to the expected result.
 - **Status / comment quality**: `STATUS` is `PASS`/`FAIL`/`PENDING`; un-executed cases are `PENDING`; `COMMENT` explains blockers or evidence rather than being noise.
 
 ## Outcome
 
-List concrete defects per `ID`. If any case fails the checklist, send it back to `generate-testcase-json` for correction before any execution.
+List concrete defects per `ID`. If edgecase categories are missing, name the missing risk area and the smallest testcase that should be added. If any case fails the checklist, send it back to `generate-testcase-json` for correction before any execution.
