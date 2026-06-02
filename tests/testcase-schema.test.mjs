@@ -70,3 +70,31 @@ test('summary counts PASS FAIL PENDING only', () => {
   const summary = summarizeCases(readFixture('valid-testcase.json'));
   assert.deepEqual(summary, { PASS: 1, FAIL: 1, PENDING: 1 });
 });
+
+import { spawnSync } from 'node:child_process';
+
+test('validate CLI exits zero for valid fixture', () => {
+  const result = spawnSync('node', ['scripts/validate-testcase-json.mjs', 'tests/fixtures/valid-testcase.json'], { encoding: 'utf8' });
+  assert.equal(result.status, 0);
+  assert.match(result.stdout, /valid testcase file/i);
+});
+
+test('validate CLI exits non-zero for grouped fixture', () => {
+  const result = spawnSync('node', ['scripts/validate-testcase-json.mjs', 'tests/fixtures/grouped-invalid-testcase.json'], { encoding: 'utf8' });
+  assert.notEqual(result.status, 0);
+  assert.match(result.stderr, /grouped testcase/i);
+});
+
+test('summary CLI prints status counts', () => {
+  const result = spawnSync('node', ['scripts/summarize-test-results.mjs', 'tests/fixtures/valid-testcase.json'], { encoding: 'utf8' });
+  assert.equal(result.status, 0);
+  assert.match(result.stdout, /PASS: 1/);
+  assert.match(result.stdout, /FAIL: 1/);
+  assert.match(result.stdout, /PENDING: 1/);
+});
+
+test('normalize CLI check mode leaves valid fixture stable', () => {
+  const result = spawnSync('node', ['scripts/normalize-testcase-json.mjs', 'tests/fixtures/valid-testcase.json', '--check'], { encoding: 'utf8' });
+  assert.equal(result.status, 0);
+  assert.match(result.stdout, /already normalized/i);
+});
