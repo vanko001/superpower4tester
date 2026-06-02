@@ -1,6 +1,6 @@
 #!/usr/bin/env node
-import fs from 'node:fs';
-import { normalizeCases, summarizeCases } from './lib/testcase-schema.mjs';
+import { normalizeCases, summarizeCases, validateCases } from './lib/testcase-schema.mjs';
+import { readJsonFileForCli } from './lib/cli-io.mjs';
 
 const file = process.argv[2];
 if (!file) {
@@ -8,7 +8,16 @@ if (!file) {
   process.exit(2);
 }
 
-const cases = normalizeCases(JSON.parse(fs.readFileSync(file, 'utf8')));
+const data = readJsonFileForCli(file);
+const result = validateCases(data);
+if (!result.valid) {
+  for (const error of result.errors) {
+    console.error(error);
+  }
+  process.exit(1);
+}
+
+const cases = normalizeCases(data);
 const summary = summarizeCases(cases);
 
 console.log(`PASS: ${summary.PASS}`);

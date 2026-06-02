@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
+import { validateCases } from '../scripts/lib/testcase-schema.mjs';
 
 const expectedSkills = [
   'using-superpower4tester',
@@ -67,4 +68,14 @@ test('runtime skill directories do not keep upstream Superpowers names', () => {
   for (const dir of dirs) {
     assert.equal(forbiddenUpstreamNames.has(dir), false, `${dir} collides with upstream`);
   }
+});
+
+test('generate-testcase-json example follows the validated schema', () => {
+  const content = fs.readFileSync(path.join('skills', 'generate-testcase-json', 'SKILL.md'), 'utf8');
+  const match = content.match(/```json\n([\s\S]*?)\n```/);
+  assert.ok(match, 'generate-testcase-json must include a JSON example');
+
+  const cases = JSON.parse(match[1]);
+  assert.equal(Array.isArray(cases[0].STEPS), true, 'example STEPS must be an array');
+  assert.equal(validateCases(cases).valid, true, 'example must pass testcase validation');
 });

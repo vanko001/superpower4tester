@@ -2,6 +2,8 @@
 
 Gemini extension manifest: `gemini-extension.json`
 
+The manifest uses `contextFileName: "GEMINI.md"`. That context file loads `skills/using-superpower4tester/SKILL.md` so Gemini gets the tester workflow bootstrap.
+
 ## Chrome DevTools MCP
 
 Gemini CLI registers Chrome DevTools MCP through an **inline `mcpServers`** block in the extension manifest (`gemini-extension.json`):

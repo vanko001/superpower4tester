@@ -1,6 +1,6 @@
 #!/usr/bin/env node
-import fs from 'node:fs';
 import { validateCases } from './lib/testcase-schema.mjs';
+import { readJsonFileForCli } from './lib/cli-io.mjs';
 
 const file = process.argv[2];
 if (!file) {
@@ -8,7 +8,7 @@ if (!file) {
   process.exit(2);
 }
 
-const data = JSON.parse(fs.readFileSync(file, 'utf8'));
+const data = readJsonFileForCli(file);
 const result = validateCases(data);
 
 for (const warning of result.warnings) {

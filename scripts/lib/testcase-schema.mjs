@@ -10,11 +10,11 @@ export const REQUIRED_COLUMNS = [
 ];
 
 const STATUS_VALUES = new Set(['PASS', 'FAIL', 'PENDING']);
+const REQUIRED_COLUMN_SET = new Set(REQUIRED_COLUMNS);
 const TITLE_PREFIXES = ['Xác nhận', 'Xác minh', 'Kiểm tra'];
 const GROUPING_HINTS = [
-  /\bvà\b/i,
-  /\band\b/i,
   /đăng nhập.*đăng xuất/i,
+  /login.*logout/i,
   /thành công.*thành công/i
 ];
 const DESTRUCTIVE_HINTS = [
@@ -74,16 +74,23 @@ const isBlank = (value) => {
   return typeof value !== 'string' || value.trim() === '';
 };
 
-const hasTitlePrefix = (title) => TITLE_PREFIXES.some((prefix) => title.startsWith(prefix));
+const hasTitlePrefix = (title) => {
+  const normalizedTitle = title.toLocaleLowerCase('vi');
+  return TITLE_PREFIXES.some((prefix) => normalizedTitle.startsWith(prefix.toLocaleLowerCase('vi')));
+};
 
 const looksGrouped = (testcase) => {
   const joined = [
     testcase.TITLE,
-    testcase['EXPECTED RESULT'],
-    ...testcase.STEPS
+    testcase['EXPECTED RESULT']
   ].join(' ');
   return GROUPING_HINTS.some((pattern) => pattern.test(joined));
 };
+
+const hasNumberedSteps = (steps) => steps.every((step, index) => {
+  const expectedPrefix = `B${index + 1}:`;
+  return step.startsWith(expectedPrefix) && step.length > expectedPrefix.length;
+});
 
 const looksDestructive = (testcase) => {
   const joined = [
@@ -102,16 +109,31 @@ export function validateCases(input) {
   if (!Array.isArray(input)) {
     return { valid: false, errors: ['testcase.json root must be an array'], warnings };
   }
+  if (input.length === 0) {
+    return { valid: false, errors: ['testcase.json must contain at least one testcase'], warnings };
+  }
 
   const cases = normalizeCases(input);
   const seen = new Set();
 
   cases.forEach((testcase, index) => {
+    const raw = input[index];
+    const rawIsObject = raw && typeof raw === 'object' && !Array.isArray(raw);
     const label = testcase.ID || `row ${index + 1}`;
 
+    if (!rawIsObject) {
+      errors.push(`${label}: testcase row must be an object`);
+      return;
+    }
+
     for (const column of REQUIRED_COLUMNS) {
-      if (!(column in testcase)) {
+      if (!(column in raw)) {
         errors.push(`${label}: missing column ${column}`);
+      }
+    }
+    for (const column of Object.keys(raw)) {
+      if (!REQUIRED_COLUMN_SET.has(column)) {
+        errors.push(`${label}: unexpected column ${column}`);
       }
     }
 
@@ -128,6 +150,8 @@ export function validateCases(input) {
     }
     if (isBlank(testcase.STEPS)) {
       errors.push(`${label}: STEPS must contain at least one step`);
+    } else if (!hasNumberedSteps(testcase.STEPS)) {
+      errors.push(`${label}: STEPS must use B1:, B2: numbered steps in order`);
     }
     if (isBlank(testcase.DATATEST)) {
       errors.push(`${label}: DATATEST must not be empty`);
@@ -137,6 +161,9 @@ export function validateCases(input) {
     }
     if (!STATUS_VALUES.has(testcase.STATUS)) {
       errors.push(`${label}: STATUS must be PASS, FAIL, or PENDING`);
+    }
+    if (testcase.STATUS === 'PASS' && isBlank(testcase['ACTUAL RESULT'])) {
+      errors.push(`${label}: PASS requires ACTUAL RESULT`);
     }
     if (testcase.STATUS === 'FAIL' && isBlank(testcase['ACTUAL RESULT'])) {
       errors.push(`${label}: FAIL requires ACTUAL RESULT`);

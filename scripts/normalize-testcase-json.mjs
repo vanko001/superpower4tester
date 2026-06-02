@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import fs from 'node:fs';
 import { normalizeCases } from './lib/testcase-schema.mjs';
+import { parseJsonForCli, readTextFileForCli } from './lib/cli-io.mjs';
 
 const [file, flag] = process.argv.slice(2);
 if (!file) {
@@ -8,8 +9,8 @@ if (!file) {
   process.exit(2);
 }
 
-const original = fs.readFileSync(file, 'utf8');
-const normalized = `${JSON.stringify(normalizeCases(JSON.parse(original)), null, 2)}\n`;
+const original = readTextFileForCli(file);
+const normalized = `${JSON.stringify(normalizeCases(parseJsonForCli(original, file)), null, 2)}\n`;
 
 if (flag === '--check') {
   if (original === normalized) {

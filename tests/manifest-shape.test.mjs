@@ -27,3 +27,12 @@ test('Claude, Cursor, and Gemini manifests carry inline mcpServers', () => {
     assert.deepEqual(manifest.mcpServers['chrome-devtools'].args, ['-y', 'chrome-devtools-mcp@1.1.1'], file);
   }
 });
+
+test('Gemini context file exists and points to tester bootstrap skill', () => {
+  const manifest = readJson('gemini-extension.json');
+  assert.equal(manifest.contextFileName, 'GEMINI.md');
+
+  const content = fs.readFileSync(manifest.contextFileName, 'utf8');
+  assert.match(content, /skills\/using-superpower4tester\/SKILL\.md/);
+  assert.doesNotMatch(content, /skills\/using-superpowers\/SKILL\.md/);
+});
