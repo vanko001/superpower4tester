@@ -1,0 +1,17 @@
+[
+  {
+    "ID": "TC001",
+    "TITLE": "Kiểm tra xóa người dùng khỏi hệ thống",
+    "STEPS": [
+      "B1: Mở trang quản lý người dùng.",
+      "B2: Chọn người dùng test-delete@example.com.",
+      "B3: Bấm nút Xóa.",
+      "B4: Xác nhận xóa."
+    ],
+    "DATATEST": "Người dùng: test-delete@example.com",
+    "EXPECTED RESULT": "Người dùng bị xóa khỏi danh sách.",
+    "ACTUAL RESULT": "",
+    "STATUS": "PENDING",
+    "COMMENT": ""
+  }
+]

@@ -1,0 +1,47 @@
+[
+  {
+    "ID": "TC001",
+    "TITLE": "Xác minh thông báo lỗi khi bỏ trống email đăng nhập",
+    "STEPS": [
+      "B1: Mở trang đăng nhập.",
+      "B2: Để trống ô Email.",
+      "B3: Nhập mật khẩu hợp lệ.",
+      "B4: Bấm nút Đăng nhập."
+    ],
+    "DATATEST": "Email: <trống>; Mật khẩu: Test@123456",
+    "EXPECTED RESULT": "Hiển thị lỗi bắt buộc nhập email.",
+    "ACTUAL RESULT": "",
+    "STATUS": "PENDING",
+    "COMMENT": ""
+  },
+  {
+    "ID": "TC002",
+    "TITLE": "Kiểm tra đăng nhập thành công với tài khoản hợp lệ",
+    "STEPS": [
+      "B1: Mở trang đăng nhập.",
+      "B2: Nhập email hợp lệ.",
+      "B3: Nhập mật khẩu hợp lệ.",
+      "B4: Bấm nút Đăng nhập."
+    ],
+    "DATATEST": "Email: tester@example.com; Mật khẩu: Test@123456",
+    "EXPECTED RESULT": "Chuyển đến trang tổng quan.",
+    "ACTUAL RESULT": "Chuyển đến trang tổng quan.",
+    "STATUS": "PASS",
+    "COMMENT": ""
+  },
+  {
+    "ID": "TC003",
+    "TITLE": "Xác nhận lỗi khi mật khẩu sai",
+    "STEPS": [
+      "B1: Mở trang đăng nhập.",
+      "B2: Nhập email hợp lệ.",
+      "B3: Nhập mật khẩu sai.",
+      "B4: Bấm nút Đăng nhập."
+    ],
+    "DATATEST": "Email: tester@example.com; Mật khẩu: Wrong@123",
+    "EXPECTED RESULT": "Hiển thị lỗi thông tin đăng nhập không đúng.",
+    "ACTUAL RESULT": "Không hiển thị lỗi và vẫn ở form đăng nhập.",
+    "STATUS": "FAIL",
+    "COMMENT": "Sau B4, hệ thống không hiển thị thông báo lỗi khi mật khẩu sai."
+  }
+]

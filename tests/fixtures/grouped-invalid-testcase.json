@@ -1,0 +1,17 @@
+[
+  {
+    "ID": "TC001",
+    "TITLE": "Kiểm tra đăng nhập và đăng xuất",
+    "STEPS": [
+      "B1: Đăng nhập bằng tài khoản hợp lệ.",
+      "B2: Kiểm tra vào dashboard.",
+      "B3: Bấm đăng xuất.",
+      "B4: Kiểm tra quay về trang đăng nhập."
+    ],
+    "DATATEST": "Email: tester@example.com; Mật khẩu: Test@123456",
+    "EXPECTED RESULT": "Đăng nhập thành công và đăng xuất thành công.",
+    "ACTUAL RESULT": "",
+    "STATUS": "PENDING",
+    "COMMENT": ""
+  }
+]
