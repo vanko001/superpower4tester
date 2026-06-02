@@ -15,7 +15,42 @@ const TITLE_PREFIXES = ['Xác nhận', 'Xác minh', 'Kiểm tra'];
 const GROUPING_HINTS = [
   /đăng nhập.*đăng xuất/i,
   /login.*logout/i,
-  /thành công.*thành công/i
+  /thành công.*thành công/i,
+  /tag an toàn.*tag nguy hiểm/i,
+  /tag nguy hiểm.*tag an toàn/i,
+  /<strong\b.*<script\b|<script\b.*<strong\b/i,
+  /<script\b.*<a\b|<a\b.*<script\b/i,
+  /<object\b.*<embed\b|<embed\b.*<object\b/i,
+  /<ul\b.*<ol\b|<ol\b.*<ul\b/i,
+  /tất cả\s+\d+\s+url/i,
+  /\b\d+\s+url\b/i,
+  /nhiều\s+url/i,
+  /url nội bộ.*url ngoài|url ngoài.*url nội bộ/i,
+  /giữ lại.*loại bỏ|loại bỏ.*giữ lại/i
+];
+const AMBIGUOUS_RESULT_HINTS = [
+  /\bhoặc\b/i,
+  /có\s+thể/i,
+  /tùy\s+(validation|rule|quy định|cấu hình|trường hợp)/i,
+  /validation\s+rule/i,
+  /\bnếu\s+(submit|gửi|thao tác)\s+được/i,
+  /chưa\s+xác\s+định/i
+];
+const VAGUE_DATA_HINTS = [
+  /một\s+.+\s+bất kỳ/i,
+  /bất kỳ/i,
+  /chuỗi\s+\d+\+\s*k[íy]\s*tự/i,
+  /\d+\+\s*k[íy]\s*tự/i,
+  /lorem\s+ipsum/i,
+  /tất cả\s+\d+\s+url/i,
+  /\b\d+\s+url\b/i,
+  /nhiều\s+url/i
+];
+const VAGUE_STEP_HINTS = [
+  /chọn\s+một\s+.+\s+bất kỳ/i,
+  /nhập\s+chuỗi\s+\d+\+\s*k[íy]\s*tự/i,
+  /nhập\s+.+\s+bất kỳ/i,
+  /thực hiện\s+.+\s+bất kỳ/i
 ];
 const DESTRUCTIVE_HINTS = [
   /xóa/i,
@@ -40,6 +75,8 @@ const emptyCase = () => ({
   COMMENT: ''
 });
 
+const formatSequentialId = (index) => `TC${String(index + 1).padStart(3, '0')}`;
+
 export function normalizeCases(input) {
   if (!Array.isArray(input)) {
     return [];
@@ -47,15 +84,12 @@ export function normalizeCases(input) {
 
   return input.map((raw, index) => {
     const merged = { ...emptyCase(), ...raw };
-    const id = typeof merged.ID === 'string' && merged.ID.trim()
-      ? merged.ID.trim()
-      : `TC${String(index + 1).padStart(3, '0')}`;
     const steps = Array.isArray(merged.STEPS)
       ? merged.STEPS
       : String(merged.STEPS || '').split(/\n+/).filter(Boolean);
 
     return {
-      ID: id,
+      ID: formatSequentialId(index),
       TITLE: String(merged.TITLE || '').trim(),
       STEPS: steps.map((step) => String(step).trim()).filter(Boolean),
       DATATEST: String(merged.DATATEST || '').trim(),
@@ -82,10 +116,16 @@ const hasTitlePrefix = (title) => {
 const looksGrouped = (testcase) => {
   const joined = [
     testcase.TITLE,
-    testcase['EXPECTED RESULT']
+    testcase.DATATEST,
+    testcase['EXPECTED RESULT'],
+    ...testcase.STEPS
   ].join(' ');
   return GROUPING_HINTS.some((pattern) => pattern.test(joined));
 };
+
+const hasAmbiguousResult = (result) => AMBIGUOUS_RESULT_HINTS.some((pattern) => pattern.test(result));
+const hasVagueData = (data) => VAGUE_DATA_HINTS.some((pattern) => pattern.test(data));
+const hasVagueSteps = (steps) => steps.some((step) => VAGUE_STEP_HINTS.some((pattern) => pattern.test(step)));
 
 const hasNumberedSteps = (steps) => steps.every((step, index) => {
   const expectedPrefix = `B${index + 1}:`;
@@ -119,7 +159,9 @@ export function validateCases(input) {
   cases.forEach((testcase, index) => {
     const raw = input[index];
     const rawIsObject = raw && typeof raw === 'object' && !Array.isArray(raw);
-    const label = testcase.ID || `row ${index + 1}`;
+    const expectedId = formatSequentialId(index);
+    const rawId = rawIsObject && typeof raw.ID === 'string' ? raw.ID.trim() : '';
+    const label = rawId || `row ${index + 1}`;
 
     if (!rawIsObject) {
       errors.push(`${label}: testcase row must be an object`);
@@ -137,13 +179,15 @@ export function validateCases(input) {
       }
     }
 
-    if (seen.has(testcase.ID)) {
+    if (rawId && seen.has(rawId)) {
       errors.push(`${label}: duplicate ID`);
     }
-    seen.add(testcase.ID);
+    if (rawId) {
+      seen.add(rawId);
+    }
 
-    if (!/^TC\d{3,}$/.test(testcase.ID)) {
-      errors.push(`${label}: ID must match TC001 format`);
+    if (rawId !== expectedId) {
+      errors.push(`${label}: ID must be sequential TC001, TC002, ... in row order; expected ${expectedId}`);
     }
     if (!hasTitlePrefix(testcase.TITLE)) {
       errors.push(`${label}: TITLE must start with Xác nhận, Xác minh, or Kiểm tra`);
@@ -155,9 +199,16 @@ export function validateCases(input) {
     }
     if (isBlank(testcase.DATATEST)) {
       errors.push(`${label}: DATATEST must not be empty`);
+    } else if (hasVagueData(testcase.DATATEST)) {
+      errors.push(`${label}: DATATEST must use concrete executable value, not vague placeholders`);
     }
     if (isBlank(testcase['EXPECTED RESULT'])) {
       errors.push(`${label}: EXPECTED RESULT must not be empty`);
+    } else if (hasAmbiguousResult(testcase['EXPECTED RESULT'])) {
+      errors.push(`${label}: EXPECTED RESULT must be deterministic and contain exactly one outcome`);
+    }
+    if (!isBlank(testcase['ACTUAL RESULT']) && hasAmbiguousResult(testcase['ACTUAL RESULT'])) {
+      errors.push(`${label}: ACTUAL RESULT must be deterministic and contain exactly one observed outcome`);
     }
     if (!STATUS_VALUES.has(testcase.STATUS)) {
       errors.push(`${label}: STATUS must be PASS, FAIL, or PENDING`);
@@ -173,6 +224,9 @@ export function validateCases(input) {
     }
     if (looksGrouped(testcase)) {
       errors.push(`${label}: grouped testcase detected; split this behavior`);
+    }
+    if (!isBlank(testcase.STEPS) && hasVagueSteps(testcase.STEPS)) {
+      errors.push(`${label}: STEPS must use concrete executable action, not vague placeholders`);
     }
     if (looksDestructive(testcase)) {
       warnings.push(`${label}: destructive or externally visible action requires explicit approval`);

@@ -34,11 +34,11 @@ For each candidate ask: "What defect would this find?" If the answer is vague, r
 
 Each testcase is an object with these keys (note the spaces in key names):
 
-- `ID` — sequential identifier (e.g., `TC001`).
+- `ID` — strict row-order identifier: `TC001`, `TC002`, `TC003`, ... only. Do not add module prefixes such as `TC-FE-001`.
 - `TITLE` — starts with `Xác nhận`, `Xác minh`, or `Kiểm tra`.
-- `STEPS` — ordered steps in `B1`, `B2`, `B3` style.
+- `STEPS` — ordered steps in `B1:`, `B2:`, `B3:` style.
 - `DATATEST` — concrete, realistic input data used by the steps.
-- `EXPECTED RESULT` — exactly one expected outcome.
+- `EXPECTED RESULT` — exactly one deterministic expected outcome.
 - `ACTUAL RESULT` — empty at generation time; filled during execution.
 - `STATUS` — `PASS`, `FAIL`, or `PENDING` (use `PENDING` until executed).
 - `COMMENT` — notes, blockers, or evidence references.
@@ -67,12 +67,16 @@ Each testcase is an object with these keys (note the spaces in key names):
 
 ## Rules
 
-- **No grouping**: one behavior per case. Do not bundle login + validation + redirect into one case.
-- **Realistic data**: use plausible values in `DATATEST`, not `xxx` or `abc`.
+- **Sequential IDs only**: assign IDs by final array order: `TC001`, `TC002`, `TC003`, ... without gaps or feature prefixes.
+- **No grouping**: one behavior, one payload/rule, and one expected outcome per case. Split matrices such as multiple tags, multiple URLs, multiple roles, or multiple validation messages into separate cases.
+- **Realistic executable data**: use plausible exact values in `DATATEST`, not `xxx`, `abc`, `một dịch vụ bất kỳ`, `chuỗi 4001+ ký tự`, `18 URL`, `nhiều URL`, or other placeholders.
+- **Concrete steps**: every step must be executable by a tester. Do not write vague steps such as "Chọn một dịch vụ bất kỳ" or "Nhập chuỗi 4001+ ký tự"; provide the actual visible option/value.
 - **Vietnamese title prefixes**: every `TITLE` starts with `Xác nhận`, `Xác minh`, or `Kiểm tra`.
 - **Use UI evidence when available**: derive labels, flows, and field names from a real snapshot/screenshot (`ui-discovery-with-chrome-devtools`), not from assumptions.
 - **STATUS at generation** is `PENDING`; do not pre-fill `PASS`/`FAIL`.
 - Cover happy path, alternate path, validation, boundary, negative, lifecycle/state, decision-table, pairwise, integration, security, performance, and risk-based edge cases when relevant.
-- Keep `EXPECTED RESULT` one observable outcome, but specific enough that a developer knows the expected state.
+- Keep `EXPECTED RESULT` one observable outcome, specific enough that a developer knows the expected state. It should normally be one clear sentence, not a tiny fragment.
+- Never use ambiguous result wording: `hoặc`, `có thể`, `tùy validation rule`, `nếu submit được`, `chưa xác định`. If the requirement is unknown, add a separate `PENDING` case with a `COMMENT` explaining the missing requirement instead of inventing alternatives.
+- For destructive or externally visible flows such as submit/payment/delete/upload/send email, keep the case `PENDING` unless the test environment and approval are explicit.
 
-After generating, run `testcase-quality-review`.
+After generating, run `testcase-quality-review`, then validate with `npm run validate:sample` or `node scripts/validate-testcase-json.mjs <path-to-testcase.json>` before execution.

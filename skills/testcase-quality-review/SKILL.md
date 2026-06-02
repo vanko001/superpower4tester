@@ -10,16 +10,20 @@ Review every generated `testcase.json` against this checklist before execution. 
 ## Checklist
 
 - **Schema**: each case has `ID`, `TITLE`, `STEPS`, `DATATEST`, `EXPECTED RESULT`, `ACTUAL RESULT`, `STATUS`, `COMMENT` with exactly those key names.
+- **ID order**: IDs are exactly `TC001`, `TC002`, `TC003`, ... in final array order. Reject feature prefixes, skipped numbers, and reordered IDs.
 - **Titles**: every `TITLE` starts with `Xác nhận`, `Xác minh`, or `Kiểm tra` and clearly names the behavior.
-- **Grouping**: each case covers exactly one behavior. Reject cases that bundle multiple checks.
-- **Data realism**: `DATATEST` uses plausible, concrete values, not placeholders.
-- **One expected result**: `EXPECTED RESULT` describes a single, verifiable outcome.
+- **Grouping**: each case covers exactly one behavior, one payload/rule, and one expected outcome. Reject cases that bundle multiple checks, multiple URLs/tags/roles, or multiple business-rule branches.
+- **Data realism**: `DATATEST` uses plausible, concrete executable values, not placeholders such as `một dịch vụ bất kỳ`, `chuỗi 4001+ ký tự`, `18 URL`, `nhiều URL`, `xxx`, or `abc`.
+- **Executable steps**: steps tell a tester exactly what to click/type/select. Reject vague actions such as "Chọn một dịch vụ bất kỳ" or "Nhập chuỗi 4001+ ký tự".
+- **One deterministic result**: `EXPECTED RESULT` describes a single, verifiable outcome and is specific enough to identify the expected UI/API state.
+- **Ambiguity ban**: reject `EXPECTED RESULT` or `ACTUAL RESULT` containing `hoặc`, `có thể`, `tùy validation rule`, `nếu submit được`, `chưa xác định`, or mixed success/error alternatives.
 - **Negative cases**: invalid inputs, empty fields, boundaries, and error paths are covered, not just the happy path.
 - **Role / state coverage**: relevant user roles, permissions, and pre-states are represented.
 - **Edgecase Coverage**: black-box techniques are represented where relevant: Risk-Based Testing, State Transition Testing, SFDPOT, Equivalence Partitioning, Boundary Value Analysis, Decision Table, Pairwise Testing, Negative Testing, Integration, security/performance, and AI QA / Agent Testing.
 - **STEPS format**: ordered `B1`, `B2`, `B3` steps that map to the expected result.
 - **Status / comment quality**: `STATUS` is `PASS`/`FAIL`/`PENDING`; un-executed cases are `PENDING`; `COMMENT` explains blockers or evidence rather than being noise.
+- **Safety**: cases that submit, delete, upload, send email, pay, or change externally visible data must require explicit test-environment approval before execution.
 
 ## Outcome
 
-List concrete defects per `ID`. If edgecase categories are missing, name the missing risk area and the smallest testcase that should be added. If any case fails the checklist, send it back to `generate-testcase-json` for correction before any execution.
+List concrete defects per `ID`. If edgecase categories are missing, name the missing risk area and the smallest testcase that should be added. If any case fails the checklist, send it back to `generate-testcase-json` for correction before any execution. Do not approve a file that fails `node scripts/validate-testcase-json.mjs <path-to-testcase.json>`.

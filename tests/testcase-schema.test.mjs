@@ -169,6 +169,109 @@ test('normalizer produces stable IDs and column order', () => {
   assert.equal(normalized[0].COMMENT, '');
 });
 
+test('normalizer rewrites testcase IDs to sequential row order', () => {
+  const normalized = normalizeCases([
+    {
+      ID: 'TC-FE-001',
+      TITLE: 'Xác minh mẫu dữ liệu hợp lệ',
+      STEPS: ['B1: Mở trang mẫu.'],
+      DATATEST: 'Mã: SAMPLE01',
+      'EXPECTED RESULT': 'Hiển thị dữ liệu mẫu.',
+      STATUS: 'PENDING'
+    },
+    {
+      ID: 'TC999',
+      TITLE: 'Kiểm tra mẫu dữ liệu thứ hai',
+      STEPS: ['B1: Mở trang mẫu thứ hai.'],
+      DATATEST: 'Mã: SAMPLE02',
+      'EXPECTED RESULT': 'Hiển thị dữ liệu mẫu thứ hai.',
+      STATUS: 'PENDING'
+    },
+    {
+      TITLE: 'Xác nhận mẫu dữ liệu thứ ba',
+      STEPS: ['B1: Mở trang mẫu thứ ba.'],
+      DATATEST: 'Mã: SAMPLE03',
+      'EXPECTED RESULT': 'Hiển thị dữ liệu mẫu thứ ba.',
+      STATUS: 'PENDING'
+    }
+  ]);
+
+  assert.deepEqual(normalized.map((testcase) => testcase.ID), ['TC001', 'TC002', 'TC003']);
+});
+
+test('validator rejects testcase IDs that are not sequential row order', () => {
+  const result = validateCases([
+    {
+      ID: 'TC003',
+      TITLE: 'Xác minh mẫu dữ liệu hợp lệ',
+      STEPS: ['B1: Mở trang mẫu.'],
+      DATATEST: 'Mã: SAMPLE01',
+      'EXPECTED RESULT': 'Hiển thị dữ liệu mẫu.',
+      'ACTUAL RESULT': '',
+      STATUS: 'PENDING',
+      COMMENT: ''
+    }
+  ]);
+
+  assert.equal(result.valid, false);
+  assert.match(result.errors.join('\n'), /ID must be sequential/i);
+});
+
+test('validator rejects ambiguous expected result choices', () => {
+  const result = validateCases([
+    {
+      ID: 'TC001',
+      TITLE: 'Kiểm tra nhập URL nội bộ trong nội dung',
+      STEPS: ['B1: Mở form hỗ trợ.', 'B2: Nhập nội dung có URL nội bộ.', 'B3: Gửi form.'],
+      DATATEST: 'Nội dung: Vui lòng xem https://example.test/help',
+      'EXPECTED RESULT': 'URL được giữ lại hoặc hiển thị thông báo validation error tùy validation rule.',
+      'ACTUAL RESULT': '',
+      STATUS: 'PENDING',
+      COMMENT: ''
+    }
+  ]);
+
+  assert.equal(result.valid, false);
+  assert.match(result.errors.join('\n'), /EXPECTED RESULT.*deterministic/i);
+});
+
+test('validator rejects grouped multi-payload testcase content', () => {
+  const result = validateCases([
+    {
+      ID: 'TC001',
+      TITLE: 'Xác nhận xử lý tag an toàn và tag nguy hiểm trong cùng nội dung',
+      STEPS: ['B1: Mở form hỗ trợ.', 'B2: Nhập nội dung có nhiều tag HTML.', 'B3: Gửi form.'],
+      DATATEST: 'Nội dung: <strong>Xin chào</strong><script>alert(1)</script><a href="https://example.test">link</a>',
+      'EXPECTED RESULT': 'Giữ lại tag an toàn và loại bỏ tag nguy hiểm.',
+      'ACTUAL RESULT': '',
+      STATUS: 'PENDING',
+      COMMENT: ''
+    }
+  ]);
+
+  assert.equal(result.valid, false);
+  assert.match(result.errors.join('\n'), /grouped testcase/i);
+});
+
+test('validator rejects non-executable datatest and vague steps', () => {
+  const result = validateCases([
+    {
+      ID: 'TC001',
+      TITLE: 'Xác minh giới hạn độ dài nội dung hỗ trợ',
+      STEPS: ['B1: Mở form hỗ trợ.', 'B2: Chọn một dịch vụ bất kỳ.', 'B3: Nhập chuỗi 4001+ ký tự.'],
+      DATATEST: 'Dịch vụ: một dịch vụ bất kỳ; Nội dung: chuỗi 4001+ ký tự',
+      'EXPECTED RESULT': 'Hiển thị lỗi nội dung vượt quá giới hạn.',
+      'ACTUAL RESULT': '',
+      STATUS: 'PENDING',
+      COMMENT: ''
+    }
+  ]);
+
+  assert.equal(result.valid, false);
+  assert.match(result.errors.join('\n'), /DATATEST.*concrete executable value/i);
+  assert.match(result.errors.join('\n'), /STEPS.*concrete executable action/i);
+});
+
 test('summary counts PASS FAIL PENDING only', () => {
   const summary = summarizeCases(readFixture('valid-testcase.json'));
   assert.deepEqual(summary, { PASS: 1, FAIL: 1, PENDING: 1 });
