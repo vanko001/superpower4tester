@@ -116,3 +116,5 @@ ${toolMapping}
     }
   };
 };
+
+export default Superpower4TesterPlugin;

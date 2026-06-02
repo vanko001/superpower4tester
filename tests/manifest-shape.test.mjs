@@ -1,6 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
+import path from 'node:path';
+import { pathToFileURL } from 'node:url';
 
 const readJson = (file) => JSON.parse(fs.readFileSync(file, 'utf8'));
 
@@ -45,4 +47,12 @@ test('package root exports the OpenCode plugin entrypoint', () => {
   assert.equal(manifest.main, entrypoint);
   assert.equal(manifest.exports, entrypoint);
   assert.equal(fs.existsSync(entrypoint), true);
+});
+
+test('OpenCode plugin provides a default export for desktop compatibility', async () => {
+  const entrypoint = pathToFileURL(path.resolve('.opencode/plugins/superpower4tester.js')).href;
+  const plugin = await import(`${entrypoint}?t=${Date.now()}`);
+
+  assert.equal(typeof plugin.default, 'function');
+  assert.equal(typeof plugin.Superpower4TesterPlugin, 'function');
 });
