@@ -1,0 +1,3 @@
+superpower4tester adapts workflow ideas and selected implementation patterns from obra/superpowers, licensed under the MIT License.
+
+superpower4tester configures Chrome DevTools MCP as a runtime MCP dependency. Chrome DevTools MCP is owned by Google LLC and licensed under Apache-2.0. This repository does not vendor Chrome DevTools MCP source code.
