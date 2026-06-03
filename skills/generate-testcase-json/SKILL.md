@@ -30,6 +30,37 @@ Apply `blackbox-edgecase-design`:
 
 For each candidate ask: "What defect would this find?" If the answer is vague, remove or rewrite the case.
 
+## Status Oracle Matrix
+
+When requirements define rule outcomes, validation levels, status codes, reasons, warnings, confirmations, or audit states, build a **Status Oracle Matrix** before writing JSON.
+
+For each rule/status row, map:
+
+- rule or business condition
+- input data class
+- expected status
+- expected reason
+- expected UI state
+- expected action gate
+- confirm/audit behavior
+- minimum testcase count
+
+Example rows for validation features:
+
+| Rule | Input class | expected status | expected reason | UI state | Action gate |
+| --- | --- | --- | --- | --- | --- |
+| R08 | valid street | `true` | `VALID` | no warning/error | continue directly |
+| R04 | all no diacritics | `true_warning` | `ALL_NO_DIACRITIC` | amber warning/dialog | confirm required |
+| R02 | admin unit in Street | `invalidate` | `CONTAINS_ADMIN_UNIT` | red error/dialog | confirm or edit |
+
+Rules:
+
+- Cover every documented status level, including `true`, `true_warning`, and `invalidate` when present.
+- Cover rule priority with separate cases when one input can match multiple rules.
+- Split status verification, UI message verification, action-gate verification, and audit/confirm verification into separate cases when they assert different outcomes.
+- Put `expected status` and `expected reason` in `DATATEST` for rule-engine cases when those states are observable through UI, network, API, logs, or agreed requirements.
+- If the requirement has a conflict, create a case with the chosen requirement-backed expected result and note the conflict in `COMMENT`; do not write `hoặc` or `có thể`.
+
 ## Exact Schema
 
 Each testcase is an object with these keys (note the spaces in key names):
@@ -78,5 +109,6 @@ Each testcase is an object with these keys (note the spaces in key names):
 - Keep `EXPECTED RESULT` one observable outcome, specific enough that a developer knows the expected state. It should normally be one clear sentence, not a tiny fragment.
 - Never use ambiguous result wording: `hoặc`, `có thể`, `tùy validation rule`, `nếu submit được`, `chưa xác định`. If the requirement is unknown, add a separate `PENDING` case with a `COMMENT` explaining the missing requirement instead of inventing alternatives.
 - For destructive or externally visible flows such as submit/payment/delete/upload/send email, keep the case `PENDING` unless the test environment and approval are explicit.
+- For status-driven validation, the final testcase set must include a visible distribution by expected status, expected reason, rule priority, confirm flow, and audit behavior where applicable.
 
 After generating, run `testcase-quality-review`, then validate with `npm run validate:sample` or `node scripts/validate-testcase-json.mjs <path-to-testcase.json>` before execution.

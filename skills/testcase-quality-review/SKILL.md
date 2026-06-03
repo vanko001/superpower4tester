@@ -17,6 +17,9 @@ Review every generated `testcase.json` against this checklist before execution. 
 - **Executable steps**: steps tell a tester exactly what to click/type/select. Reject vague actions such as "Chọn một dịch vụ bất kỳ" or "Nhập chuỗi 4001+ ký tự".
 - **One deterministic result**: `EXPECTED RESULT` describes a single, verifiable outcome and is specific enough to identify the expected UI/API state.
 - **Ambiguity ban**: reject `EXPECTED RESULT` or `ACTUAL RESULT` containing `hoặc`, `có thể`, `tùy validation rule`, `nếu submit được`, `chưa xác định`, or mixed success/error alternatives.
+- **Status oracle coverage**: when requirements define statuses, rules, or reasons, verify that the set covers every documented level such as `true`, `true_warning`, and `invalidate`, plus expected reason codes.
+- **Rule priority**: reject the set if overlapping rule conditions are not tested separately or if expected priority is hidden inside a grouped case.
+- **Confirm and audit**: for warning/invalid flows, verify separate cases for initial warning/error, user confirm, user edit/retry, and audit queue behavior when the requirement includes `confirm` or `audit`.
 - **Negative cases**: invalid inputs, empty fields, boundaries, and error paths are covered, not just the happy path.
 - **Role / state coverage**: relevant user roles, permissions, and pre-states are represented.
 - **Edgecase Coverage**: black-box techniques are represented where relevant: Risk-Based Testing, State Transition Testing, SFDPOT, Equivalence Partitioning, Boundary Value Analysis, Decision Table, Pairwise Testing, Negative Testing, Integration, security/performance, and AI QA / Agent Testing.

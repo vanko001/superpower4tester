@@ -115,3 +115,30 @@ test('testcase design skills include black-box edgecase heuristics', () => {
   assert.match(using, /Black-box edgecase design: `blackbox-edgecase-design`/);
   assert.match(plan, /Black-box edgecase matrix/);
 });
+
+test('testcase generation requires a status oracle coverage matrix', () => {
+  const generator = fs.readFileSync(path.join('skills', 'generate-testcase-json', 'SKILL.md'), 'utf8');
+  const quality = fs.readFileSync(path.join('skills', 'testcase-quality-review', 'SKILL.md'), 'utf8');
+
+  for (const keyword of [
+    'Status Oracle Matrix',
+    'expected status',
+    'expected reason',
+    'rule priority',
+    'true_warning',
+    'invalidate'
+  ]) {
+    assert.match(generator, new RegExp(keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')), `generator missing ${keyword}`);
+  }
+
+  for (const keyword of [
+    'Status oracle coverage',
+    'true',
+    'true_warning',
+    'invalidate',
+    'confirm',
+    'audit'
+  ]) {
+    assert.match(quality, new RegExp(keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')), `quality review missing ${keyword}`);
+  }
+});
