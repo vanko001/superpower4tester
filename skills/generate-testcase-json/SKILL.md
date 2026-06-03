@@ -41,25 +41,25 @@ Create a **Browser Evidence Map** before writing `EXPECTED RESULT`:
 - baseline state before data entry
 - observed state after submit/continue for representative valid, warning, and invalid payloads
 - actual warning/error text, dialog title, button labels, disabled/enabled state, and page transition
-- visual treatment only when the requirement, UI copy, or user explicitly asks for it
+- chi tiết hiển thị chỉ ghi nhận khi requirement, UI copy, hoặc user yêu cầu rõ
 - relevant network request URL/method/status/payload fields when expected behavior depends on backend validation
 
-Use the Browser Evidence Map as the oracle for UI wording and action gates. Requirements remain the oracle for business rules, but browser evidence anchors how those rules appear in the product. If browser evidence is missing, blocked, or unsafe to collect, do not finalize the testcase set with guessed UI expected results; keep affected cases `PENDING` and put the blocker in `COMMENT`.
+Use the Browser Evidence Map as the oracle for UI wording and action gates. Requirements remain the oracle for business rules, but browser evidence anchors how those rules appear in the product. If browser evidence is missing, blocked, or unsafe to collect, do not finalize the testcase set with guessed UI expected results; keep affected cases `PENDING` and put only the blocker or rule/source note in `COMMENT`.
 
 ## Expected Result Oracle
 
 Before writing each UI `EXPECTED RESULT`, trace the expected outcome to both sources:
 
 - **Document Oracle**: the requirement rule, acceptance criterion, status/reason, or business behavior that defines what must happen.
-- **Browser Oracle**: the state actually observed with Chrome DevTools MCP: visible text, dialog/action gate, page transition, network response, and visual state.
+- **Browser Oracle**: the state actually observed with Chrome DevTools MCP: visible text, dialog/action gate, page transition, network response, and trạng thái hiển thị.
 
 Rules:
 
 - Do not write a UI `EXPECTED RESULT` until the related browser state has been exercised with Chrome DevTools MCP.
-- Do not turn colors, icons, layout, or styling into mandatory testcase assertions unless the requirement, UI copy, or user explicitly asks to verify them.
-- Keep the `EXPECTED RESULT` to one observable outcome. Put document rule IDs, browser evidence IDs, screenshots, network request IDs, and unresolved gaps in `COMMENT`.
-- If docs and browser disagree, do not write `hoặc` or `có thể`. Use the requirement-backed outcome as the expected result, record the browser mismatch in `COMMENT`, and keep the case `PENDING` until execution confirms whether it is a defect or a requirement gap.
-- If Chrome DevTools MCP is unavailable, do not finalize UI expected results from documents alone. Create or keep a blocked `PENDING` case with the missing browser evidence in `COMMENT`.
+- Các kiểm tra giao diện chỉ nằm trong `EXPECTED RESULT` khi requirement, UI copy, hoặc user yêu cầu rõ. Không đưa kiểm tra giao diện vào `COMMENT`.
+- Keep the `EXPECTED RESULT` to one observable outcome. `COMMENT` chỉ ghi rule/source liên quan, blocker ngắn, hoặc khoảng trống yêu cầu cần xác nhận.
+- If docs and browser disagree, do not write `hoặc` or `có thể`. Use the requirement-backed outcome as the expected result, note only the related rule/source conflict in `COMMENT`, and keep the case `PENDING` until execution confirms whether it is a defect or a requirement gap.
+- If Chrome DevTools MCP is unavailable, do not finalize UI expected results from documents alone. Create or keep a blocked `PENDING` case with the missing browser evidence blocker in `COMMENT`.
 
 ## Language Rules
 
@@ -110,7 +110,7 @@ Each testcase is an object with these keys (note the spaces in key names):
 - `EXPECTED RESULT` — exactly one deterministic expected outcome.
 - `ACTUAL RESULT` — empty at generation time; filled during execution.
 - `STATUS` — `PASS`, `FAIL`, or `PENDING` (use `PENDING` until executed).
-- `COMMENT` — notes, blockers, or evidence references.
+- `COMMENT` — only related rule/source notes or short blockers.
 
 ## Example
 

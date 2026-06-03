@@ -27,7 +27,7 @@ Review every generated `testcase.json` against this checklist before execution. 
 - **Role / state coverage**: relevant user roles, permissions, and pre-states are represented.
 - **Edgecase Coverage**: black-box techniques are represented where relevant: Risk-Based Testing, State Transition Testing, SFDPOT, Equivalence Partitioning, Boundary Value Analysis, Decision Table, Pairwise Testing, Negative Testing, Integration, security/performance, and AI QA / Agent Testing.
 - **STEPS format**: ordered `B1`, `B2`, `B3` steps that map to the expected result.
-- **Status / comment quality**: `STATUS` is `PASS`/`FAIL`/`PENDING`; un-executed cases are `PENDING`; `COMMENT` explains blockers or evidence rather than being noise.
+- **Status / comment quality**: `STATUS` is `PASS`/`FAIL`/`PENDING`; un-executed cases are `PENDING`; `COMMENT` chỉ ghi rule/source liên quan hoặc blocker ngắn. Reject comments that contain expected results, UI assertions, browser evidence narration, or filler text.
 - **Safety**: cases that submit, delete, upload, send email, pay, or change externally visible data must require explicit test-environment approval before execution.
 
 ## Outcome

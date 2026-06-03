@@ -190,8 +190,15 @@ test('UI expected results use document and browser oracles without hard color ch
     assert.equal(combined.includes(forbidden), false, `skills must not hard-require ${forbidden}`);
   }
 
+  for (const forbidden of ['màu', 'color', 'colors']) {
+    assert.equal(combined.toLowerCase().includes(forbidden.toLowerCase()), false, `skills must not mention ${forbidden}`);
+  }
+
   assert.match(combined, /Hạn chế tiếng Anh/);
   assert.match(combined, /Vietnamese-first/);
+  assert.match(generator, /kiểm tra giao diện.*`EXPECTED RESULT`/);
+  assert.match(generator, /`COMMENT` chỉ ghi rule\/source liên quan/);
+  assert.match(quality, /`COMMENT` chỉ ghi rule\/source liên quan/);
   assert.match(using, /Expected Result Oracle/);
 });
 
