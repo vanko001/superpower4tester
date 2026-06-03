@@ -162,3 +162,23 @@ test('UI testcase generation requires browser evidence before final expected res
   assert.match(generator, /do not finalize the testcase set/);
   assert.match(quality, /Reject UI testcase files that do not include browser evidence/);
 });
+
+test('runtime tester skills do not hardcode project-specific Street examples', () => {
+  const forbiddenTerms = [
+    'Street',
+    'street',
+    'PAERP',
+    'PA Vietnam',
+    'pavietnam',
+    'book.html',
+    'cloud-server'
+  ];
+
+  for (const skill of expectedSkills) {
+    const file = path.join('skills', skill, 'SKILL.md');
+    const content = fs.readFileSync(file, 'utf8');
+    for (const term of forbiddenTerms) {
+      assert.equal(content.includes(term), false, `${file} must not hardcode ${term}`);
+    }
+  }
+});

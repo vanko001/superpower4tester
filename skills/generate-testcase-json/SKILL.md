@@ -64,9 +64,9 @@ Example rows for validation features:
 
 | Rule | Input class | expected status | expected reason | UI state | Action gate |
 | --- | --- | --- | --- | --- | --- |
-| R08 | valid street | `true` | `VALID` | no warning/error | continue directly |
-| R04 | all no diacritics | `true_warning` | `ALL_NO_DIACRITIC` | amber warning/dialog | confirm required |
-| R02 | admin unit in Street | `invalidate` | `CONTAINS_ADMIN_UNIT` | red error/dialog | confirm or edit |
+| R01 | documented valid input | `true` | `VALID` | no warning/error | continue directly |
+| R02 | documented warning-level input | `true_warning` | `WARNING_REASON` | warning message/dialog | confirm required |
+| R03 | documented invalid input | `invalidate` | `INVALID_REASON` | error message/dialog | edit required |
 
 Rules:
 
