@@ -15,7 +15,6 @@ Design before execution. Writing results before designing granular, reviewed cas
    - visible field label, placeholder, required marker, helper text, and button labels
    - baseline state before input
    - observed state/message after submit/continue for representative valid, warning, and invalid data
-   - Visual Evidence Matrix for warning/error/success styling, including screenshot or computed style evidence for color and placement
    - relevant console/network evidence when the UI result depends on an API response
    If Chrome DevTools MCP is unavailable or the page cannot be reached, record that blocker and do not finalize deterministic UI expected results from guesses.
 3. **Map black-box risks and edge cases**: apply `blackbox-edgecase-design` before writing cases. Think beyond direct requirements: Risk-Based Testing, CRUD/lifecycle, State Transition Testing, SFDPOT, Equivalence Partitioning, Boundary Value Analysis, Decision Table, Pairwise Testing, Negative Testing, Integration, security, performance, and AI QA / Agent Testing when relevant.
@@ -32,4 +31,5 @@ Design before execution. Writing results before designing granular, reviewed cas
 - Do not stop at 5W1H; include risk, lifecycle/state, data classes, boundaries, negative behavior, integrations, and time-based failures.
 - For UI validation features, do not write final `EXPECTED RESULT` from documents alone. Use the Browser Evidence Map to anchor visible messages, action gates, and actual screen state.
 - For expected results, combine documents and browser observation: documents define the business oracle, Chrome DevTools defines the UI oracle.
+- Use Vietnamese-first testcase wording. Hạn chế tiếng Anh except for exact UI labels, codes, URLs, field/API names, and source terms.
 - If scope is unclear, stop and use `tester-scope-discovery` first.

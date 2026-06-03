@@ -41,7 +41,7 @@ Create a **Browser Evidence Map** before writing `EXPECTED RESULT`:
 - baseline state before data entry
 - observed state after submit/continue for representative valid, warning, and invalid payloads
 - actual warning/error text, dialog title, button labels, disabled/enabled state, and page transition
-- **Visual Evidence Matrix** for visual states: screenshot reference plus computed style values for warning/error/success text, including `background-color`, `border-color`, `text color`, icon/class name, and placement near the affected control
+- visual treatment only when the requirement, UI copy, or user explicitly asks for it
 - relevant network request URL/method/status/payload fields when expected behavior depends on backend validation
 
 Use the Browser Evidence Map as the oracle for UI wording and action gates. Requirements remain the oracle for business rules, but browser evidence anchors how those rules appear in the product. If browser evidence is missing, blocked, or unsafe to collect, do not finalize the testcase set with guessed UI expected results; keep affected cases `PENDING` and put the blocker in `COMMENT`.
@@ -52,15 +52,21 @@ Before writing each UI `EXPECTED RESULT`, trace the expected outcome to both sou
 
 - **Document Oracle**: the requirement rule, acceptance criterion, status/reason, or business behavior that defines what must happen.
 - **Browser Oracle**: the state actually observed with Chrome DevTools MCP: visible text, dialog/action gate, page transition, network response, and visual state.
-- **Visual Evidence Matrix**: required whenever the expected result mentions warning/error/success color, icon, placement, disabled/enabled styling, or other visual treatment.
 
 Rules:
 
 - Do not write a UI `EXPECTED RESULT` until the related browser state has been exercised with Chrome DevTools MCP.
-- Do not write color words such as warning color, red, amber, green, disabled gray, or highlighted state unless the Browser Evidence Map contains a screenshot or computed style evidence for that exact state.
+- Do not turn colors, icons, layout, or styling into mandatory testcase assertions unless the requirement, UI copy, or user explicitly asks to verify them.
 - Keep the `EXPECTED RESULT` to one observable outcome. Put document rule IDs, browser evidence IDs, screenshots, network request IDs, and unresolved gaps in `COMMENT`.
 - If docs and browser disagree, do not write `hoặc` or `có thể`. Use the requirement-backed outcome as the expected result, record the browser mismatch in `COMMENT`, and keep the case `PENDING` until execution confirms whether it is a defect or a requirement gap.
 - If Chrome DevTools MCP is unavailable, do not finalize UI expected results from documents alone. Create or keep a blocked `PENDING` case with the missing browser evidence in `COMMENT`.
+
+## Language Rules
+
+- **Vietnamese-first**: write `TITLE`, `STEPS`, `DATATEST`, `EXPECTED RESULT`, and `COMMENT` primarily in Vietnamese.
+- **Hạn chế tiếng Anh** trong testcase. Keep English only when it is an exact UI label, field name, API/status/reason code, product term, URL, or source requirement term that must stay unchanged.
+- Prefer Vietnamese verbs and nouns in tester-facing text: use "hiển thị", "nhập", "nhấn", "trạng thái", "thông báo", "kết quả mong đợi" instead of casual English filler.
+- Do not mix explanatory English such as "trigger", "expected", "verify", "inline", or "submit" when a natural Vietnamese phrase is clear enough.
 
 ## Status Oracle Matrix
 

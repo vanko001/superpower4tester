@@ -163,33 +163,35 @@ test('UI testcase generation requires browser evidence before final expected res
   assert.match(quality, /Reject UI testcase files that do not include browser evidence/);
 });
 
-test('UI expected results require document and browser visual evidence', () => {
+test('UI expected results use document and browser oracles without hard color checks', () => {
   const generator = fs.readFileSync(path.join('skills', 'generate-testcase-json', 'SKILL.md'), 'utf8');
   const quality = fs.readFileSync(path.join('skills', 'testcase-quality-review', 'SKILL.md'), 'utf8');
   const uiDiscovery = fs.readFileSync(path.join('skills', 'ui-discovery-with-chrome-devtools', 'SKILL.md'), 'utf8');
   const using = fs.readFileSync(path.join('skills', 'using-superpower4tester', 'SKILL.md'), 'utf8');
+  const designFirst = fs.readFileSync(path.join('skills', 'testcase-design-first', 'SKILL.md'), 'utf8');
 
   for (const keyword of [
     'Expected Result Oracle',
     'Document Oracle',
-    'Browser Oracle',
-    'Visual Evidence Matrix'
+    'Browser Oracle'
   ]) {
     assert.match(generator, new RegExp(keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')), `generator missing ${keyword}`);
   }
 
-  for (const keyword of [
-    'take_screenshot',
-    'evaluate_script',
+  const combined = `${generator}\n${quality}\n${uiDiscovery}\n${using}\n${designFirst}`;
+  for (const forbidden of [
+    'Visual Evidence Matrix',
     'computed style',
     'background-color',
     'border-color',
-    'text color'
+    'text color',
+    'warning/error colors without screenshot or computed style evidence'
   ]) {
-    assert.match(uiDiscovery, new RegExp(keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')), `ui discovery missing ${keyword}`);
+    assert.equal(combined.includes(forbidden), false, `skills must not hard-require ${forbidden}`);
   }
 
-  assert.match(quality, /Reject expected results that describe warning\/error colors without screenshot or computed style evidence/);
+  assert.match(combined, /Hạn chế tiếng Anh/);
+  assert.match(combined, /Vietnamese-first/);
   assert.match(using, /Expected Result Oracle/);
 });
 
