@@ -143,6 +143,29 @@ test('testcase generation requires a status oracle coverage matrix', () => {
   }
 });
 
+test('testcase generation has no testcase cap and requires a rule coverage gate', () => {
+  const generator = fs.readFileSync(path.join('skills', 'generate-testcase-json', 'SKILL.md'), 'utf8');
+
+  for (const keyword of [
+    'không có giới hạn tối đa',
+    'Coverage gate',
+    'R01',
+    'R02',
+    'R03',
+    'R04',
+    'R05',
+    'R06',
+    'R07',
+    'R08',
+    'không phải giới hạn tối đa'
+  ]) {
+    assert.match(generator, new RegExp(keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')), `generator missing ${keyword}`);
+  }
+
+  assert.match(generator, /`DATATEST`.*string/i);
+  assert.match(generator, /Không được dùng toán tử `\+`, `\.repeat`, `repeat\(\.\.\.\)`/);
+});
+
 test('UI testcase generation requires browser evidence before final expected results', () => {
   const designFirst = fs.readFileSync(path.join('skills', 'testcase-design-first', 'SKILL.md'), 'utf8');
   const generator = fs.readFileSync(path.join('skills', 'generate-testcase-json', 'SKILL.md'), 'utf8');

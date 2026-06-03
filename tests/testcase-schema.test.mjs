@@ -253,6 +253,24 @@ test('validator rejects grouped multi-payload testcase content', () => {
   assert.match(result.errors.join('\n'), /grouped testcase/i);
 });
 
+test('validator rejects non-string datatest values', () => {
+  const result = validateCases([
+    {
+      ID: 'TC001',
+      TITLE: 'Xác minh dữ liệu test phải là chuỗi',
+      STEPS: ['B1: Nhập mã SAMPLE01.'],
+      DATATEST: { code: 'SAMPLE01' },
+      'EXPECTED RESULT': 'Hiển thị dữ liệu mẫu.',
+      'ACTUAL RESULT': '',
+      STATUS: 'PENDING',
+      COMMENT: ''
+    }
+  ]);
+
+  assert.equal(result.valid, false);
+  assert.match(result.errors.join('\n'), /DATATEST.*string/i);
+});
+
 test('validator rejects non-executable datatest and vague steps', () => {
   const result = validateCases([
     {

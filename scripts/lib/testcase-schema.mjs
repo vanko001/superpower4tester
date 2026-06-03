@@ -199,6 +199,8 @@ export function validateCases(input) {
     }
     if (isBlank(testcase.DATATEST)) {
       errors.push(`${label}: DATATEST must not be empty`);
+    } else if (typeof raw.DATATEST !== 'string') {
+      errors.push(`${label}: DATATEST must be a string`);
     } else if (hasVagueData(testcase.DATATEST)) {
       errors.push(`${label}: DATATEST must use concrete executable value, not vague placeholders`);
     }

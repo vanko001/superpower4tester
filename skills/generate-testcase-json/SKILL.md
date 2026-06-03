@@ -99,6 +99,19 @@ Rules:
 - Put `expected status` and `expected reason` in `DATATEST` for rule-engine cases when those states are observable through UI, network, API, logs, or agreed requirements.
 - If the requirement has a conflict, create a case with the chosen requirement-backed expected result and note the conflict in `COMMENT`; do not write `hoặc` or `có thể`.
 
+## Coverage gate
+
+There is **không có giới hạn tối đa** for testcase count. Generate as many granular cases as are required for real coverage, then stop only when every meaningful rule, status, data class, UI trigger, and edge condition has its own case. Minimum counts in this section are **không phải giới hạn tối đa**.
+
+Before writing final JSON, run this gate:
+
+- If requirements define numbered rules, cover every rule ID separately. For rule sets like `R01` through `R08`, the final set must include `R01`, `R02`, `R03`, `R04`, `R05`, `R06`, `R07`, and `R08`.
+- Do not let valid/happy-path cases dominate the file. Warning, invalid, boundary, priority-overlap, and UI action-gate cases must be represented.
+- For each rule/status pair, include more than one data sample when the rule has distinct risk variants.
+- For rule engines with priority order, include separate overlap cases proving the first matching rule wins.
+- For UI validation, include separate cases for field blur, continue/submit action, visible warning/error state, confirmation or blocker, and re-validation after editing data when those states exist.
+- If the generated set has only a few cases for a complex rule matrix, continue expanding; do not compress cases just to keep output short.
+
 ## Exact Schema
 
 Each testcase is an object with these keys (note the spaces in key names):
@@ -106,7 +119,7 @@ Each testcase is an object with these keys (note the spaces in key names):
 - `ID` — strict row-order identifier: `TC001`, `TC002`, `TC003`, ... only. Do not add module prefixes such as `TC-FE-001`.
 - `TITLE` — starts with `Xác nhận`, `Xác minh`, or `Kiểm tra`.
 - `STEPS` — ordered steps in `B1:`, `B2:`, `B3:` style.
-- `DATATEST` — concrete, realistic input data used by the steps.
+- `DATATEST` — concrete, realistic input data used by the steps. `DATATEST` must be a single string, not an object or array.
 - `EXPECTED RESULT` — exactly one deterministic expected outcome.
 - `ACTUAL RESULT` — empty at generation time; filled during execution.
 - `STATUS` — `PASS`, `FAIL`, or `PENDING` (use `PENDING` until executed).
@@ -139,6 +152,8 @@ Each testcase is an object with these keys (note the spaces in key names):
 - **Sequential IDs only**: assign IDs by final array order: `TC001`, `TC002`, `TC003`, ... without gaps or feature prefixes.
 - **No grouping**: one behavior, one payload/rule, and one expected outcome per case. Split matrices such as multiple tags, multiple URLs, multiple roles, or multiple validation messages into separate cases.
 - **Realistic executable data**: use plausible exact values in `DATATEST`, not `xxx`, `abc`, `một dịch vụ bất kỳ`, `chuỗi 4001+ ký tự`, `18 URL`, `nhiều URL`, or other placeholders.
+- **Long data as clear text**: for very long payloads, keep `DATATEST` as a string that states the exact construction in Vietnamese, such as `Nội dung: bắt đầu bằng TEST và theo sau là 1001 ký tự A liên tiếp`; do not expand thousands of characters into JSON.
+- **JSON-safe data**: Không được dùng toán tử `+`, `.repeat`, `repeat(...)`, or JavaScript expressions in any testcase field. Write long-data construction as plain text inside the string.
 - **Concrete steps**: every step must be executable by a tester. Do not write vague steps such as "Chọn một dịch vụ bất kỳ" or "Nhập chuỗi 4001+ ký tự"; provide the actual visible option/value.
 - **Vietnamese title prefixes**: every `TITLE` starts with `Xác nhận`, `Xác minh`, or `Kiểm tra`.
 - **Browser evidence first for UI cases**: derive labels, flows, messages, action gates, and field names from a real snapshot/screenshot/network trace (`ui-discovery-with-chrome-devtools`), not from assumptions.
