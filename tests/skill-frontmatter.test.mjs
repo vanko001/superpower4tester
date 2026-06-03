@@ -142,3 +142,23 @@ test('testcase generation requires a status oracle coverage matrix', () => {
     assert.match(quality, new RegExp(keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')), `quality review missing ${keyword}`);
   }
 });
+
+test('UI testcase generation requires browser evidence before final expected results', () => {
+  const designFirst = fs.readFileSync(path.join('skills', 'testcase-design-first', 'SKILL.md'), 'utf8');
+  const generator = fs.readFileSync(path.join('skills', 'generate-testcase-json', 'SKILL.md'), 'utf8');
+  const quality = fs.readFileSync(path.join('skills', 'testcase-quality-review', 'SKILL.md'), 'utf8');
+  const uiDiscovery = fs.readFileSync(path.join('skills', 'ui-discovery-with-chrome-devtools', 'SKILL.md'), 'utf8');
+
+  for (const [label, content] of [
+    ['testcase-design-first', designFirst],
+    ['generate-testcase-json', generator],
+    ['testcase-quality-review', quality],
+    ['ui-discovery-with-chrome-devtools', uiDiscovery]
+  ]) {
+    assert.match(content, /Browser Evidence Map/, `${label} must require a Browser Evidence Map`);
+  }
+
+  assert.match(generator, /MUST run `ui-discovery-with-chrome-devtools` before finalizing UI testcase JSON/);
+  assert.match(generator, /do not finalize the testcase set/);
+  assert.match(quality, /Reject UI testcase files that do not include browser evidence/);
+});

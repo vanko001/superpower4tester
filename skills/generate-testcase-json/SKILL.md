@@ -30,6 +30,21 @@ Apply `blackbox-edgecase-design`:
 
 For each candidate ask: "What defect would this find?" If the answer is vague, remove or rewrite the case.
 
+## Browser Evidence Gate
+
+When a testcase depends on UI behavior, form validation, visible warnings/errors, button state, page transition, modal/dialog text, or browser-observed API behavior, you MUST run `ui-discovery-with-chrome-devtools` before finalizing UI testcase JSON.
+
+Create a **Browser Evidence Map** before writing `EXPECTED RESULT`:
+
+- target URL and exact navigation path used to reach the screen
+- actual field label, placeholder, required marker, helper text, and button labels
+- baseline state before data entry
+- observed state after submit/continue for representative valid, warning, and invalid payloads
+- actual warning/error text, dialog title, button labels, disabled/enabled state, and page transition
+- relevant network request URL/method/status/payload fields when expected behavior depends on backend validation
+
+Use the Browser Evidence Map as the oracle for UI wording and action gates. Requirements remain the oracle for business rules, but browser evidence anchors how those rules appear in the product. If browser evidence is missing, blocked, or unsafe to collect, do not finalize the testcase set with guessed UI expected results; keep affected cases `PENDING` and put the blocker in `COMMENT`.
+
 ## Status Oracle Matrix
 
 When requirements define rule outcomes, validation levels, status codes, reasons, warnings, confirmations, or audit states, build a **Status Oracle Matrix** before writing JSON.
@@ -103,11 +118,12 @@ Each testcase is an object with these keys (note the spaces in key names):
 - **Realistic executable data**: use plausible exact values in `DATATEST`, not `xxx`, `abc`, `một dịch vụ bất kỳ`, `chuỗi 4001+ ký tự`, `18 URL`, `nhiều URL`, or other placeholders.
 - **Concrete steps**: every step must be executable by a tester. Do not write vague steps such as "Chọn một dịch vụ bất kỳ" or "Nhập chuỗi 4001+ ký tự"; provide the actual visible option/value.
 - **Vietnamese title prefixes**: every `TITLE` starts with `Xác nhận`, `Xác minh`, or `Kiểm tra`.
-- **Use UI evidence when available**: derive labels, flows, and field names from a real snapshot/screenshot (`ui-discovery-with-chrome-devtools`), not from assumptions.
+- **Browser evidence first for UI cases**: derive labels, flows, messages, action gates, and field names from a real snapshot/screenshot/network trace (`ui-discovery-with-chrome-devtools`), not from assumptions.
 - **STATUS at generation** is `PENDING`; do not pre-fill `PASS`/`FAIL`.
 - Cover happy path, alternate path, validation, boundary, negative, lifecycle/state, decision-table, pairwise, integration, security, performance, and risk-based edge cases when relevant.
 - Keep `EXPECTED RESULT` one observable outcome, specific enough that a developer knows the expected state. It should normally be one clear sentence, not a tiny fragment.
 - Never use ambiguous result wording: `hoặc`, `có thể`, `tùy validation rule`, `nếu submit được`, `chưa xác định`. If the requirement is unknown, add a separate `PENDING` case with a `COMMENT` explaining the missing requirement instead of inventing alternatives.
+- For UI validation cases, never replace missing browser evidence with `hoặc`, `có thể`, or guessed modal/error wording. Re-run UI discovery, or mark the case blocked in `COMMENT` and do not finalize the testcase set.
 - For destructive or externally visible flows such as submit/payment/delete/upload/send email, keep the case `PENDING` unless the test environment and approval are explicit.
 - For status-driven validation, the final testcase set must include a visible distribution by expected status, expected reason, rule priority, confirm flow, and audit behavior where applicable.
 

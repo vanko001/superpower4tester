@@ -14,6 +14,19 @@ Use the Chrome DevTools MCP tools to observe the real application. Never invent 
 - **Inspect console and network when relevant**: use `list_console_messages` for JS errors and `list_network_requests` / `get_network_request` to verify API calls, status codes, and payloads for behaviors that depend on backend responses.
 - **Do not guess labels**: read actual text, placeholders, and roles from the snapshot. If an element is not found, re-snapshot rather than assuming.
 
+## Browser Evidence Map
+
+For testcase design, produce a compact Browser Evidence Map before generating UI expected results:
+
+- **Route**: target URL, navigation path, and page/form name.
+- **Controls**: actual labels, placeholders, required markers, helper text, and button labels.
+- **Baseline**: visible state before input and submit/continue.
+- **Validation samples**: at least one representative valid, warning, and invalid payload when the requirement defines those levels.
+- **Observed outcomes**: exact warning/error/success text, dialog title, action buttons, disabled/enabled state, and page transition.
+- **Backend evidence**: network request URL/method/status and response fields used as the oracle when validation is API-driven.
+
+If a value cannot be observed safely, record the blocker. Do not fill missing UI facts with assumptions.
+
 ## Typical Flow
 
 1. `navigate_page` to the target URL (test/staging only).

@@ -13,6 +13,7 @@ A complete plan records:
 
 - **Source docs**: links/paths to requirements, tickets, specs, acceptance criteria the plan is derived from.
 - **UI discovery targets**: the exact URLs/screens to inspect, and what to capture (snapshot, screenshot, console, network).
+- **Browser Evidence Map**: route, controls, baseline state, representative valid/warning/invalid observed outcomes, and network evidence that will anchor UI expected results.
 - **Testcase groups**: logical groups (e.g., login, validation, permissions), each listing the behaviors to cover. One behavior maps to one future testcase.
 - **Black-box edgecase matrix**: risk, lifecycle/state, SFDPOT, equivalence partitions, boundaries, decision table, pairwise dimensions, negative inputs, integration failures, security/performance risks, and AI QA / Agent Testing risks when applicable.
 - **Execution order**: the sequence to run groups, including any prerequisite setup or data dependencies.
@@ -23,7 +24,7 @@ A complete plan records:
 
 1. Confirm scope and environment first (`tester-scope-discovery`).
 2. Apply `blackbox-edgecase-design` before writing testcase groups.
-3. Derive groups from the source docs and UI, not from guesses.
+3. Derive groups from the source docs and Browser Evidence Map, not from guesses.
 4. Keep groups independent where possible so they can run in parallel (`parallel-test-analysis`).
 5. State the environment safety constraints (test/staging only; destructive actions need approval).
 

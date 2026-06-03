@@ -15,6 +15,7 @@ Review every generated `testcase.json` against this checklist before execution. 
 - **Grouping**: each case covers exactly one behavior, one payload/rule, and one expected outcome. Reject cases that bundle multiple checks, multiple URLs/tags/roles, or multiple business-rule branches.
 - **Data realism**: `DATATEST` uses plausible, concrete executable values, not placeholders such as `một dịch vụ bất kỳ`, `chuỗi 4001+ ký tự`, `18 URL`, `nhiều URL`, `xxx`, or `abc`.
 - **Executable steps**: steps tell a tester exactly what to click/type/select. Reject vague actions such as "Chọn một dịch vụ bất kỳ" or "Nhập chuỗi 4001+ ký tự".
+- **Browser evidence gate**: Reject UI testcase files that do not include browser evidence from `ui-discovery-with-chrome-devtools` before final expected results. For UI validation cases, check that the design notes include a Browser Evidence Map with route, controls, baseline state, representative observed outcomes, and relevant network evidence.
 - **One deterministic result**: `EXPECTED RESULT` describes a single, verifiable outcome and is specific enough to identify the expected UI/API state.
 - **Ambiguity ban**: reject `EXPECTED RESULT` or `ACTUAL RESULT` containing `hoặc`, `có thể`, `tùy validation rule`, `nếu submit được`, `chưa xác định`, or mixed success/error alternatives.
 - **Status oracle coverage**: when requirements define statuses, rules, or reasons, verify that the set covers every documented level such as `true`, `true_warning`, and `invalidate`, plus expected reason codes.
@@ -29,4 +30,4 @@ Review every generated `testcase.json` against this checklist before execution. 
 
 ## Outcome
 
-List concrete defects per `ID`. If edgecase categories are missing, name the missing risk area and the smallest testcase that should be added. If any case fails the checklist, send it back to `generate-testcase-json` for correction before any execution. Do not approve a file that fails `node scripts/validate-testcase-json.mjs <path-to-testcase.json>`.
+List concrete defects per `ID`. If edgecase categories are missing, name the missing risk area and the smallest testcase that should be added. If browser evidence is missing for UI expected results, send the work back to `ui-discovery-with-chrome-devtools` before regenerating. If any case fails the checklist, send it back to `generate-testcase-json` for correction before any execution. Do not approve a file that fails `node scripts/validate-testcase-json.mjs <path-to-testcase.json>`.

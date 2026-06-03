@@ -18,6 +18,16 @@ description: Use when starting a tester-focused session, generating testcase JSO
 
 Before testcase design, UI inspection, execution, result writing, or defect analysis, invoke the smallest relevant superpower4tester skill.
 
+For UI testcase generation, the required order is:
+
+1. `testcase-design-first`
+2. `ui-discovery-with-chrome-devtools` to build a Browser Evidence Map
+3. `blackbox-edgecase-design`
+4. `generate-testcase-json`
+5. `testcase-quality-review`
+
+Do not let `generate-testcase-json` finalize UI expected results from documents or a user prompt alone.
+
 ## Skill Map
 
 - Unclear scope: `tester-scope-discovery`
@@ -40,3 +50,4 @@ Before testcase design, UI inspection, execution, result writing, or defect anal
 - Titles start with `Xác nhận`, `Xác minh`, or `Kiểm tra`.
 - Status is `PASS`, `FAIL`, or `PENDING`.
 - Do not set `PASS` or `FAIL` without fresh evidence.
+- For UI cases, expected results must be grounded in a Browser Evidence Map or explicitly blocked in `COMMENT`.
