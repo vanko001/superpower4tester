@@ -28,6 +28,8 @@ For UI testcase generation, the required order is:
 
 Do not let `generate-testcase-json` finalize UI expected results from documents or a user prompt alone.
 
+For UI cases, apply the **Expected Result Oracle** before writing JSON: use the current requirements as the Document Oracle and Chrome DevTools MCP observations as the Browser Oracle. If a testcase asserts warning/error colors or visual state, require a Visual Evidence Matrix with screenshot or computed style evidence.
+
 ## Skill Map
 
 - Unclear scope: `tester-scope-discovery`
@@ -51,3 +53,4 @@ Do not let `generate-testcase-json` finalize UI expected results from documents 
 - Status is `PASS`, `FAIL`, or `PENDING`.
 - Do not set `PASS` or `FAIL` without fresh evidence.
 - For UI cases, expected results must be grounded in a Browser Evidence Map or explicitly blocked in `COMMENT`.
+- Do not mention visual colors or styling in `EXPECTED RESULT` unless browser evidence captured the actual visual state.

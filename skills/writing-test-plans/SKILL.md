@@ -14,6 +14,8 @@ A complete plan records:
 - **Source docs**: links/paths to requirements, tickets, specs, acceptance criteria the plan is derived from.
 - **UI discovery targets**: the exact URLs/screens to inspect, and what to capture (snapshot, screenshot, console, network).
 - **Browser Evidence Map**: route, controls, baseline state, representative valid/warning/invalid observed outcomes, and network evidence that will anchor UI expected results.
+- **Visual Evidence Matrix**: screenshot or computed style evidence for warning/error/success colors, borders, icons, placement, and disabled/enabled states.
+- **Expected Result Oracle**: how each UI expected result will combine the Document Oracle and Browser Oracle.
 - **Testcase groups**: logical groups (e.g., login, validation, permissions), each listing the behaviors to cover. One behavior maps to one future testcase.
 - **Black-box edgecase matrix**: risk, lifecycle/state, SFDPOT, equivalence partitions, boundaries, decision table, pairwise dimensions, negative inputs, integration failures, security/performance risks, and AI QA / Agent Testing risks when applicable.
 - **Execution order**: the sequence to run groups, including any prerequisite setup or data dependencies.

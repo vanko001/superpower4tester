@@ -163,6 +163,36 @@ test('UI testcase generation requires browser evidence before final expected res
   assert.match(quality, /Reject UI testcase files that do not include browser evidence/);
 });
 
+test('UI expected results require document and browser visual evidence', () => {
+  const generator = fs.readFileSync(path.join('skills', 'generate-testcase-json', 'SKILL.md'), 'utf8');
+  const quality = fs.readFileSync(path.join('skills', 'testcase-quality-review', 'SKILL.md'), 'utf8');
+  const uiDiscovery = fs.readFileSync(path.join('skills', 'ui-discovery-with-chrome-devtools', 'SKILL.md'), 'utf8');
+  const using = fs.readFileSync(path.join('skills', 'using-superpower4tester', 'SKILL.md'), 'utf8');
+
+  for (const keyword of [
+    'Expected Result Oracle',
+    'Document Oracle',
+    'Browser Oracle',
+    'Visual Evidence Matrix'
+  ]) {
+    assert.match(generator, new RegExp(keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')), `generator missing ${keyword}`);
+  }
+
+  for (const keyword of [
+    'take_screenshot',
+    'evaluate_script',
+    'computed style',
+    'background-color',
+    'border-color',
+    'text color'
+  ]) {
+    assert.match(uiDiscovery, new RegExp(keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')), `ui discovery missing ${keyword}`);
+  }
+
+  assert.match(quality, /Reject expected results that describe warning\/error colors without screenshot or computed style evidence/);
+  assert.match(using, /Expected Result Oracle/);
+});
+
 test('runtime tester skills do not hardcode project-specific Street examples', () => {
   const forbiddenTerms = [
     'Street',

@@ -12,6 +12,7 @@ Use the Chrome DevTools MCP tools to observe the real application. Never invent 
 - **Snapshot before acting**: call `take_snapshot` to read the current DOM/accessibility tree before clicking, filling, or asserting. Use the snapshot's element references for subsequent actions.
 - **Screenshots for visual assertions**: use `take_screenshot` when the expected result is visual (layout, rendered state, error banners, images). Attach/reference it as evidence.
 - **Inspect console and network when relevant**: use `list_console_messages` for JS errors and `list_network_requests` / `get_network_request` to verify API calls, status codes, and payloads for behaviors that depend on backend responses.
+- **Computed style for visual assertions**: use `evaluate_script` on the relevant element to capture computed style values when color/state matters.
 - **Do not guess labels**: read actual text, placeholders, and roles from the snapshot. If an element is not found, re-snapshot rather than assuming.
 
 ## Browser Evidence Map
@@ -23,6 +24,7 @@ For testcase design, produce a compact Browser Evidence Map before generating UI
 - **Baseline**: visible state before input and submit/continue.
 - **Validation samples**: at least one representative valid, warning, and invalid payload when the requirement defines those levels.
 - **Observed outcomes**: exact warning/error/success text, dialog title, action buttons, disabled/enabled state, and page transition.
+- **Visual Evidence Matrix**: for warning/error/success states, capture `take_screenshot` and `evaluate_script` computed style values: `background-color`, `border-color`, `text color`, font weight, icon/class name, and element placement near the affected control.
 - **Backend evidence**: network request URL/method/status and response fields used as the oracle when validation is API-driven.
 
 If a value cannot be observed safely, record the blocker. Do not fill missing UI facts with assumptions.
@@ -33,7 +35,7 @@ If a value cannot be observed safely, record the blocker. Do not fill missing UI
 2. `take_snapshot` to map the page.
 3. Interact (`click`, `fill`, `fill_form`) using snapshot references.
 4. `wait_for` expected text/state to settle.
-5. Capture evidence: `take_screenshot`, console, and network as needed.
+5. Capture evidence: `take_screenshot`, console, network, and computed style via `evaluate_script` as needed.
 
 ## Safety
 
